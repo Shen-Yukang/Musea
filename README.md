@@ -112,8 +112,7 @@ Musea 是一个现代化的Chrome浏览器扩展，专为提高工作和学习�
 ```bash
 # 克隆项目
 git clone <repository-url>
-cd Fuck_Brain_Concentration
-
+cd Musea
 # 安装依赖
 pnpm install
 
