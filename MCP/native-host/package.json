@@ -1,0 +1,33 @@
+{
+  "name": "mcp-native-host",
+  "version": "1.0.0",
+  "description": "Native Messaging Host for Chrome Extension MCP",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "dev": "nodemon src/main.js",
+    "test": "jest",
+    "install-host": "node scripts/install-native-host.js"
+  },
+  "keywords": [
+    "mcp",
+    "chrome-extension",
+    "native-messaging"
+  ],
+  "author": "Your Company",
+  "license": "MIT",
+  "dependencies": {
+    "winston": "^3.11.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "bin": {
+    "mcp-native-host": "./src/main.js"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "com.yourcompany.mcp_bridge",
+  "description": "MCP Bridge for Chrome Extension",
+  "path": "/Users/shenyukang/StudioSpace/tool/ChromePlugins/Musea/MCP/native-host/src/main.js",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://odgcejinaoiapdngakchodjcncnmpmfa/"]
+}

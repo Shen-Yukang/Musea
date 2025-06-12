@@ -1,0 +1,10 @@
+{
+  "extends": "@extension/tsconfig/module",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["index.mts", "lib"]
+}

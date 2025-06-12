@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>压力、大脑与高精力生活：互动指南</title>
+    <script src="tailwind.min.js"></script>
+    <script src="chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A three-part SPA designed to guide the user from understanding the problem to exploring solutions and finally creating a personal action plan. Section 1 ("The Vicious Cycle") uses an interactive brain diagram and charts to explain the science without being overwhelming. Section 2 ("Reshape Your Brain") acts as an interactive toolkit, presenting actionable strategies in a digestible card format. Section 3 ("Your High-Energy Plan") makes the information personal and actionable via an interactive checklist. This structure prioritizes user empowerment and a journey from knowledge to application, which is more effective for the target audience than a linear report. -->
+    <!-- Visualization & Content Choices: 1) Brain Diagram (HTML/CSS): Goal=Organize/Inform. Interactive divs for key brain areas to simplify complex anatomy. Interaction=Click to display info card. Justification=More engaging than static text. 2) Bar Charts (Chart.js): Goal=Compare. Visualize stress impact (e.g., PFC function reduction). Interaction=Paired with info cards. Justification=Quickly conveys data. 3) Strategy Cards (HTML/JS): Goal=Organize/Inform. Grid layout for browsability. Interaction=Click to expand details. Justification=Breaks down solutions into manageable chunks. 4) Action Plan (HTML/JS): Goal=Apply. Interactive checklist. Interaction=Click to add/remove items. Justification=Turns passive learning into active commitment. All choices avoid SVG/Mermaid and focus on clarity and user engagement. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #F8F7F4;
+            color: #374151;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .brain-area {
+            transition: background-color 0.3s, transform 0.3s;
+            cursor: pointer;
+        }
+        .brain-area:hover, .brain-area.active {
+            background-color: #60a5fa;
+            transform: scale(1.05);
+            color: white;
+        }
+        .strategy-card .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+        }
+        .strategy-card.open .details {
+            max-height: 1000px;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-blue-500">高精力生活指南</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#problem" class="nav-link border-b-2 border-transparent pb-1">恶性循环</a>
+                <a href="#solution" class="nav-link border-b-2 border-transparent pb-1">重塑大脑</a>
+                <a href="#plan" class="nav-link border-b-2 border-transparent pb-1">我的计划</a>
+            </div>
+             <div class="md:hidden">
+                <select id="mobile-nav" class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <option value="#problem">恶性循环</option>
+                    <option value="#solution">重塑大脑</option>
+                    <option value="#plan">我的计划</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-16">
+
+        <section id="problem" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">注意力不集中？疲劳？贼怪自己没毅力？</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">宝贝，不不！绝对不要责怪自己没有毅力，其实经过大量的研究统计，你感受到的困顿，并非意志力薄弱。这背后是压力对大脑产生的真实影响。点击下方大脑的不同区域，了解它们如何被压力改变，并驱动了那些"伤害身体"的行为。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="relative w-full max-w-md mx-auto aspect-square flex items-center justify-center">
+                    <div class="absolute w-full h-full bg-gray-200 rounded-full opacity-50"></div>
+                    <div id="pfc" data-target="pfc" class="brain-area absolute top-0 left-1/2 -translate-x-1/2 w-48 h-24 bg-blue-300 rounded-t-full text-center pt-8 font-semibold">前额叶皮层</div>
+                    <div id="hippocampus" data-target="hippocampus" class="brain-area absolute bottom-12 left-1/4 -translate-x-1/3 w-32 h-16 bg-green-300 rounded-lg -rotate-12 text-center pt-4 font-semibold">海马体</div>
+                    <div id="amygdala" data-target="amygdala" class="brain-area absolute bottom-12 right-1/4 translate-x-1/3 w-32 h-16 bg-red-300 rounded-lg rotate-12 text-center pt-4 font-semibold">杏仁核</div>
+                    <div id="reward" data-target="reward" class="brain-area absolute bottom-24 left-1/2 -translate-x-1/2 w-40 h-16 bg-yellow-300 rounded-b-full text-center pt-4 font-semibold">奖赏系统</div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-lg min-h-[450px]">
+                    <div id="info-display">
+                        <h3 id="info-title" class="text-2xl font-bold text-gray-800 mb-4">请选择一个大脑区域</h3>
+                        <p id="info-description" class="text-gray-600 mb-4">从左侧的大脑图谱中选择一个区域，来查看压力如何对其产生影响，以及这如何导致具体的行为。</p>
+                        <div class="chart-container">
+                            <canvas id="brainChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="mb-24 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">第二步：探索重塑大脑的策略</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">大脑拥有惊人的可塑性。这意味着我们可以通过有意识的行动来修复它，并建立新的健康回路。点击下面的卡片，探索每种方法的科学原理和行动指南。</p>
+            </div>
+            <div id="strategy-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+        </section>
+
+        <section id="plan" class="scroll-mt-20">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800">第三步：创建你的高精力计划</h2>
+                <p class="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">知识需要转化为行动。从上面的策略中，选择你希望在本周尝试的几项，将它们添加到你的个人计划中。从小处着手，持续坚持。</p>
+            </div>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="text-3xl mr-3">🗓️</span>我的本周计划</h3>
+                <ul id="my-plan-list" class="list-disc list-inside space-y-3 text-gray-700">
+                   <li id="plan-placeholder">你的计划清单是空的。请从上方的"重塑大脑"策略中添加。</li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="text-center p-6 mt-16 text-gray-500 text-sm">
+        <p>基于神经科学研究，旨在帮助您理解并改善身心状态。本应用内容仅供参考。</p>
+    </footer>
+
+    <script src="brain-guide.js"></script>
+</body>
+</html>

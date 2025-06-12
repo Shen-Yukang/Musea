@@ -1,0 +1,225 @@
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:45:43.337Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:45:43.338Z"}
+{"error":"Unexpected end of JSON input","input":"","level":"error","message":"Main process error","timestamp":"2025-06-07T21:45:43.340Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:45:57.132Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:45:57.134Z"}
+{"command":"system_info","level":"info","message":"Processing request","requestId":"test-123","timestamp":"2025-06-07T21:45:57.136Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"test-123","timestamp":"2025-06-07T21:45:57.136Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[2.77392578125,3.740234375,3.7978515625],"memory":{"free":675348480,"total":38654705664,"used":37979357184},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T21:45:57.137Z","uptime":158515}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:46:03.044Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:46:03.045Z"}
+{"command":"play_music","level":"info","message":"Processing request","query":"播放音乐","requestId":"test-music","timestamp":"2025-06-07T21:46:03.047Z"}
+{"intent":{"action":"play_music","params":{"query":"play_music 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"test-music","timestamp":"2025-06-07T21:46:03.047Z"}
+{"level":"info","message":"Playing music","query":"play_music 播放音乐","timestamp":"2025-06-07T21:46:03.048Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:46:33.738Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:46:33.739Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"test search","requestId":"test-search","timestamp":"2025-06-07T21:46:33.742Z"}
+{"intent":{"action":"chrome_search","params":{"query":"test search"}},"level":"debug","message":"Parsed intent","requestId":"test-search","timestamp":"2025-06-07T21:46:33.742Z"}
+{"level":"info","message":"Chrome search requested","query":"test search","timestamp":"2025-06-07T21:46:33.742Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:46:45.852Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:46:45.853Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"test-calc","timestamp":"2025-06-07T21:46:45.855Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"test-calc","timestamp":"2025-06-07T21:46:45.855Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-07T21:46:45.856Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:48:40.302Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:48:40.303Z"}
+{"command":"system_info","level":"info","message":"Processing request","requestId":"test-system-info","timestamp":"2025-06-07T21:48:40.305Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"test-system-info","timestamp":"2025-06-07T21:48:40.305Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[2.923828125,3.45849609375,3.671875],"memory":{"free":812826624,"total":38654705664,"used":37841879040},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T21:48:40.306Z","uptime":158678}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:48:41.468Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:48:41.469Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"Node.js MCP","requestId":"test-search","timestamp":"2025-06-07T21:48:41.471Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js MCP"}},"level":"debug","message":"Parsed intent","requestId":"test-search","timestamp":"2025-06-07T21:48:41.472Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js MCP","timestamp":"2025-06-07T21:48:41.472Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:48:42.634Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:48:42.635Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"test-calculator","timestamp":"2025-06-07T21:48:42.637Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"test-calculator","timestamp":"2025-06-07T21:48:42.638Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-07T21:48:42.638Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:49:11.422Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:49:11.423Z"}
+{"command":"system_info","level":"info","message":"Processing request","requestId":"test-system-info","timestamp":"2025-06-07T21:49:11.424Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"test-system-info","timestamp":"2025-06-07T21:49:11.425Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[2.34912109375,3.26904296875,3.5947265625],"memory":{"free":815661056,"total":38654705664,"used":37839044608},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T21:49:11.425Z","uptime":158709}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:49:12.586Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:49:12.587Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"Node.js MCP","requestId":"test-search","timestamp":"2025-06-07T21:49:12.589Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js MCP"}},"level":"debug","message":"Parsed intent","requestId":"test-search","timestamp":"2025-06-07T21:49:12.589Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js MCP","timestamp":"2025-06-07T21:49:12.589Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:49:13.749Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:49:13.750Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"test-calculator","timestamp":"2025-06-07T21:49:13.752Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"test-calculator","timestamp":"2025-06-07T21:49:13.752Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-07T21:49:13.753Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:50:38.741Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:50:38.742Z"}
+{"command":"system_info","level":"info","message":"Processing request","requestId":"test-system-info","timestamp":"2025-06-07T21:50:38.743Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"test-system-info","timestamp":"2025-06-07T21:50:38.743Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.93701171875,3.50732421875,3.64794921875],"memory":{"free":310050816,"total":38654705664,"used":38344654848},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T21:50:38.744Z","uptime":158796}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:50:39.897Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:50:39.898Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"Node.js MCP","requestId":"test-search","timestamp":"2025-06-07T21:50:39.900Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js MCP"}},"level":"debug","message":"Parsed intent","requestId":"test-search","timestamp":"2025-06-07T21:50:39.900Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js MCP","timestamp":"2025-06-07T21:50:39.900Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:50:41.052Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:50:41.053Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"test-calculator","timestamp":"2025-06-07T21:50:41.055Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"test-calculator","timestamp":"2025-06-07T21:50:41.055Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-07T21:50:41.055Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:51:50.091Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:51:50.092Z"}
+{"command":"system_info","level":"info","message":"Processing request","requestId":"test-system-info","timestamp":"2025-06-07T21:51:50.094Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"test-system-info","timestamp":"2025-06-07T21:51:50.094Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[2.89208984375,3.32568359375,3.5693359375],"memory":{"free":380452864,"total":38654705664,"used":38274252800},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T21:51:50.095Z","uptime":158868}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:51:51.228Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:51:51.229Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"Node.js MCP","requestId":"test-search","timestamp":"2025-06-07T21:51:51.231Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js MCP"}},"level":"debug","message":"Parsed intent","requestId":"test-search","timestamp":"2025-06-07T21:51:51.231Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js MCP","timestamp":"2025-06-07T21:51:51.231Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T21:51:52.399Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T21:51:52.400Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"test-calculator","timestamp":"2025-06-07T21:51:52.402Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"test-calculator","timestamp":"2025-06-07T21:51:52.402Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-07T21:51:52.402Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:06:50.295Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:06:50.296Z"}
+{"error":"Unexpected end of JSON input","input":"","level":"error","message":"Main process error","timestamp":"2025-06-07T22:06:50.297Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:12:38.642Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:12:38.643Z"}
+{"error":"Unexpected end of JSON input","input":"","level":"error","message":"Main process error","timestamp":"2025-06-07T22:12:38.645Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:19:03.160Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:19:03.161Z"}
+{"error":"Unexpected end of JSON input","input":"","level":"error","message":"Main process error","timestamp":"2025-06-07T22:19:03.162Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:21:05.330Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:21:05.331Z"}
+{"error":"Unexpected end of JSON input","input":"","level":"error","message":"Main process error","timestamp":"2025-06-07T22:21:05.333Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:22:12.301Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:22:12.302Z"}
+{"error":"Unexpected end of JSON input","input":"","level":"error","message":"Main process error","timestamp":"2025-06-07T22:22:12.303Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:27:08.317Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:27:08.318Z"}
+{"command":"system_info","level":"info","message":"Processing request","requestId":"test-system-info","timestamp":"2025-06-07T22:27:08.320Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"test-system-info","timestamp":"2025-06-07T22:27:08.320Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[2.41943359375,2.4921875,2.78466796875],"memory":{"free":4994859008,"total":38654705664,"used":33659846656},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T22:27:08.321Z","uptime":160986}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:31:07.230Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:31:07.232Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"chrome_test_001","timestamp":"2025-06-07T22:31:07.233Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_001","timestamp":"2025-06-07T22:31:07.234Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.03564453125,2.751953125,2.82421875],"memory":{"free":4716756992,"total":38654705664,"used":33937948672},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T22:31:07.234Z","uptime":161225}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:31:08.393Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:31:08.394Z"}
+{"command":"play_music","level":"info","message":"Processing request","query":"播放音乐","requestId":"chrome_test_002","timestamp":"2025-06-07T22:31:08.396Z"}
+{"intent":{"action":"play_music","params":{"query":"play_music 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_002","timestamp":"2025-06-07T22:31:08.396Z"}
+{"level":"info","message":"Playing music","query":"play_music 播放音乐","timestamp":"2025-06-07T22:31:08.396Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:31:09.506Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:31:09.507Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"chrome_test_003","timestamp":"2025-06-07T22:31:09.508Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_003","timestamp":"2025-06-07T22:31:09.509Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-07T22:31:09.509Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:31:10.678Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:31:10.679Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"Node.js MCP","requestId":"chrome_test_004","timestamp":"2025-06-07T22:31:10.681Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js MCP"}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_004","timestamp":"2025-06-07T22:31:10.681Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js MCP","timestamp":"2025-06-07T22:31:10.681Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:43:41.943Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:43:41.944Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"req_1749336221828_mkx7s1e32","timestamp":"2025-06-07T22:43:41.946Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"req_1749336221828_mkx7s1e32","timestamp":"2025-06-07T22:43:41.947Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.345703125,3.5302734375,3.279296875],"memory":{"free":2396717056,"total":38654705664,"used":36257988608},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T22:43:41.947Z","uptime":161979}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-07T22:44:02.501Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-07T22:44:02.502Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"req_1749336242377_ytzga5gns","timestamp":"2025-06-07T22:44:02.504Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"req_1749336242377_ytzga5gns","timestamp":"2025-06-07T22:44:02.504Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.033203125,3.43896484375,3.251953125],"memory":{"free":2191212544,"total":38654705664,"used":36463493120},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-07T22:44:02.504Z","uptime":162000}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:40:43.760Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:40:43.762Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"chrome_test_001","timestamp":"2025-06-10T02:40:43.764Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_001","timestamp":"2025-06-10T02:40:43.764Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.32666015625,3.13330078125,3.224609375],"memory":{"free":3946971136,"total":38654705664,"used":34707734528},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-10T02:40:43.765Z","uptime":349000}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:40:44.844Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:40:44.845Z"}
+{"command":"play_music","level":"info","message":"Processing request","query":"播放音乐","requestId":"chrome_test_002","timestamp":"2025-06-10T02:40:44.846Z"}
+{"intent":{"action":"play_music","params":{"query":"play_music 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_002","timestamp":"2025-06-10T02:40:44.847Z"}
+{"level":"info","message":"Playing music","query":"play_music 播放音乐","timestamp":"2025-06-10T02:40:44.847Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:40:45.962Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:40:45.963Z"}
+{"command":"open_app","level":"info","message":"Processing request","query":"calculator","requestId":"chrome_test_003","timestamp":"2025-06-10T02:40:45.965Z"}
+{"intent":{"action":"open_app","params":{"app":"calculator"}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_003","timestamp":"2025-06-10T02:40:45.965Z"}
+{"actualApp":"Calculator","level":"info","message":"Opening application","requestedApp":"calculator","timestamp":"2025-06-10T02:40:45.965Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:40:47.111Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:40:47.112Z"}
+{"command":"chrome_search","level":"info","message":"Processing request","query":"Node.js MCP","requestId":"chrome_test_004","timestamp":"2025-06-10T02:40:47.114Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js MCP"}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_004","timestamp":"2025-06-10T02:40:47.114Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js MCP","timestamp":"2025-06-10T02:40:47.114Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:42:37.824Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:42:37.825Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"debug_test_001","timestamp":"2025-06-10T02:42:37.827Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"debug_test_001","timestamp":"2025-06-10T02:42:37.828Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[5.25927734375,3.89990234375,3.51416015625],"memory":{"free":3252404224,"total":38654705664,"used":35402301440},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-10T02:42:37.828Z","uptime":349114}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:42:38.004Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:42:38.005Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"debug_bridge_001","timestamp":"2025-06-10T02:42:38.008Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"debug_bridge_001","timestamp":"2025-06-10T02:42:38.008Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[5.25927734375,3.89990234375,3.51416015625],"memory":{"free":3232366592,"total":38654705664,"used":35422339072},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-10T02:42:38.008Z","uptime":349115}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:54:09.677Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:54:09.679Z"}
+{"command":"code_search","level":"info","message":"Processing request","query":"React最新的开源项目","requestId":"req_1749524049539_cqvwrf6jw","timestamp":"2025-06-10T02:54:09.681Z"}
+{"intent":{"action":"chrome_search","params":{"query":"React最新的开源项目"}},"level":"debug","message":"Parsed intent","requestId":"req_1749524049539_cqvwrf6jw","timestamp":"2025-06-10T02:54:09.681Z"}
+{"level":"info","message":"Chrome search requested","query":"React最新的开源项目","timestamp":"2025-06-10T02:54:09.681Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:55:03.511Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:55:03.512Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"debug_test_001","timestamp":"2025-06-10T02:55:03.514Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"debug_test_001","timestamp":"2025-06-10T02:55:03.514Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.9013671875,4.5087890625,4.06689453125],"memory":{"free":1609547776,"total":38654705664,"used":37045157888},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-10T02:55:03.515Z","uptime":349860}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T02:55:03.666Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T02:55:03.667Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"debug_bridge_001","timestamp":"2025-06-10T02:55:03.669Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"debug_bridge_001","timestamp":"2025-06-10T02:55:03.669Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[3.9013671875,4.5087890625,4.06689453125],"memory":{"free":1630765056,"total":38654705664,"used":37023940608},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-10T02:55:03.670Z","uptime":349860}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:05:27.660Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:05:27.661Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"Node.js","requestId":"req_1749524727518_plxfk1tzi","timestamp":"2025-06-10T03:05:27.662Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js"}},"level":"debug","message":"Parsed intent","requestId":"req_1749524727518_plxfk1tzi","timestamp":"2025-06-10T03:05:27.663Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js","timestamp":"2025-06-10T03:05:27.663Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:08:57.906Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:08:57.907Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"Node.js","requestId":"req_1749524937782_p55hl2efj","timestamp":"2025-06-10T03:08:57.909Z"}
+{"intent":{"action":"chrome_search","params":{"query":"Node.js"}},"level":"debug","message":"Parsed intent","requestId":"req_1749524937782_p55hl2efj","timestamp":"2025-06-10T03:08:57.909Z"}
+{"level":"info","message":"Chrome search requested","query":"Node.js","timestamp":"2025-06-10T03:08:57.910Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:10:32.503Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:10:32.505Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749525032389_dancgq6gn","timestamp":"2025-06-10T03:10:32.506Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749525032389_dancgq6gn","timestamp":"2025-06-10T03:10:32.507Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:10:32.507Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:10:44.722Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:10:44.723Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749525044614_m80dhjebi","timestamp":"2025-06-10T03:10:44.725Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749525044614_m80dhjebi","timestamp":"2025-06-10T03:10:44.725Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:10:44.725Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:11:17.906Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:11:17.907Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749525077801_ghxpikcmi","timestamp":"2025-06-10T03:11:17.909Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749525077801_ghxpikcmi","timestamp":"2025-06-10T03:11:17.909Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:11:17.909Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:26:43.050Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:26:43.051Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"打开音乐","requestId":"req_1749526002931_6hjs97fkh","timestamp":"2025-06-10T03:26:43.053Z"}
+{"intent":{"action":"chrome_search","params":{"query":"打开音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749526002931_6hjs97fkh","timestamp":"2025-06-10T03:26:43.053Z"}
+{"level":"info","message":"Chrome search requested","query":"打开音乐","timestamp":"2025-06-10T03:26:43.053Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:28:39.994Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:28:39.995Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749526119881_eisj1793d","timestamp":"2025-06-10T03:28:39.997Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749526119881_eisj1793d","timestamp":"2025-06-10T03:28:39.997Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:28:39.997Z"}
+{"error":"Command failed: osascript -e '\ntell application \"QQMusic\" to activate\ndelay 3\ntell application \"System Events\"\n    tell process \"QQMusic\"\n        set frontmost to true\n        key code 48\n        delay 0.5\n        keystroke \" \"\n    end tell\nend tell'\n146:157: execution error: System Events got an error: osascript is not allowed to send keystrokes. (1002)\n","level":"error","message":"Failed to play music","timestamp":"2025-06-10T03:28:45.462Z"}
+{"error":"播放音乐失败: Command failed: osascript -e '\ntell application \"QQMusic\" to activate\ndelay 3\ntell application \"System Events\"\n    tell process \"QQMusic\"\n        set frontmost to true\n        key code 48\n        delay 0.5\n        keystroke \" \"\n    end tell\nend tell'\n146:157: execution error: System Events got an error: osascript is not allowed to send keystrokes. (1002)\n","level":"error","message":"Request processing failed","requestId":"req_1749526119881_eisj1793d","stack":"Error: 播放音乐失败: Command failed: osascript -e '\ntell application \"QQMusic\" to activate\ndelay 3\ntell application \"System Events\"\n    tell process \"QQMusic\"\n        set frontmost to true\n        key code 48\n        delay 0.5\n        keystroke \" \"\n    end tell\nend tell'\n146:157: execution error: System Events got an error: osascript is not allowed to send keystrokes. (1002)\n\n    at MCPClient.playMusic (/Users/shenyukang/StudioSpace/tool/ChromePlugins/Fuck_Brain_Concentration/MCP/client/src/client.js:220:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async MCPClient.handleRequest (/Users/shenyukang/StudioSpace/tool/ChromePlugins/Fuck_Brain_Concentration/MCP/client/src/client.js:116:24)\n    at async Socket.<anonymous> (/Users/shenyukang/StudioSpace/tool/ChromePlugins/Fuck_Brain_Concentration/MCP/client/src/client.js:406:22)","timestamp":"2025-06-10T03:28:45.463Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:29:03.601Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:29:03.602Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749526143486_7z0lmnoi8","timestamp":"2025-06-10T03:29:03.604Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749526143486_7z0lmnoi8","timestamp":"2025-06-10T03:29:03.604Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:29:03.604Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-10T03:47:36.850Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-10T03:47:36.851Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749527256711_wwqm1uinx","timestamp":"2025-06-10T03:47:36.853Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749527256711_wwqm1uinx","timestamp":"2025-06-10T03:47:36.853Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:47:36.853Z"}

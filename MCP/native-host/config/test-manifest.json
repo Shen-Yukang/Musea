@@ -1,0 +1,7 @@
+{
+  "name": "com.yourcompany.mcp_bridge",
+  "description": "MCP Bridge for Chrome Extension - Test Version",
+  "path": "/Users/shenyukang/StudioSpace/tool/ChromePlugins/Fuck_Brain_Concentration/MCP/native-host/src/test-host.js",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://odgcejinaoiapdngakchodjcncnmpmfa/"]
+}

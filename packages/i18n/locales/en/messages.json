@@ -1,0 +1,30 @@
+{
+  "extensionDescription": {
+    "description": "Extension description",
+    "message": "一个无广告免费开源绿色的专注插件，从外在给你增加自制力，减少一些不必要的网站的干扰, 还你一个纯粹的知识海洋 ^-^"
+  },
+  "extensionName": {
+    "description": "Extension name",
+    "message": "Fuck_Brain_Concentration"
+  },
+  "toggleTheme": {
+    "message": "Toggle theme"
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "greeting": {
+    "description": "Greeting message",
+    "message": "Hello, My name is $NAME$",
+    "placeholders": {
+      "name": {
+        "content": "$1",
+        "example": "John Doe"
+      }
+    }
+  },
+  "hello": {
+    "description": "Placeholder example",
+    "message": "Hello $1"
+  }
+}
