@@ -7,3 +7,4 @@ export * from './SoundSettings';
 export * from './TTSSettings';
 export * from './SpeechChatSettings';
 export * from './VirtualCharacter';
+export * from './MeditationSettings';

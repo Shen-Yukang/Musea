@@ -73,6 +73,8 @@ const manifest = {
         'blocked.html',
         'blocked.js',
         'brain-guide.js',
+        'meditation.html',
+        'meditation.js',
         'tailwind.min.js',
         'chart.min.js',
         // Content scripts resources

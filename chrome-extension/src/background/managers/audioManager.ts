@@ -1,4 +1,4 @@
-import { soundSettingsStorage, ttsConfigStorage, voiceCacheStorage } from '@extension/storage';
+import { soundSettingsStorage, ttsConfigStorage, voiceCacheStorage, meditationStorage } from '@extension/storage';
 import { TTSTextProcessor, TTSCacheManager, TTSErrorHandler } from '@extension/shared';
 import { TTSService } from '../../services/ttsService.js';
 import { TIMEOUTS, MESSAGE_TYPES, ERROR_MESSAGES } from '../../constants/index.js';
@@ -289,6 +289,106 @@ export class AudioManager {
         // 等待一段时间后重试
         await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
       }
+    }
+  }
+
+  /**
+   * 播放冥想场景音频
+   */
+  async playMeditationAudio(scene: string, volume: number, loop: boolean = true): Promise<void> {
+    try {
+      console.log(`Playing meditation audio for scene: ${scene}, volume: ${volume}, loop: ${loop}`);
+
+      // 使用offscreen document来播放音频
+      await this.ensureOffscreenDocument();
+
+      // 获取场景音频URL
+      const audioUrl = await this.getMeditationAudioUrl(scene);
+
+      // 向offscreen document发送播放冥想音频的消息
+      const response = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.PLAY_MEDITATION_AUDIO,
+        scene,
+        volume,
+        loop,
+        audioUrl,
+      });
+
+      if (response && response.success) {
+        console.log(`Meditation audio for scene ${scene} started successfully`);
+      } else {
+        console.error('Failed to play meditation audio:', response?.error);
+        throw new Error(response?.error || 'Failed to play meditation audio');
+      }
+    } catch (error) {
+      console.error('Error playing meditation audio:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 停止冥想音频
+   */
+  async stopMeditationAudio(): Promise<void> {
+    try {
+      console.log('Stopping meditation audio');
+
+      // 向offscreen document发送停止冥想音频的消息
+      const response = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.STOP_MEDITATION_AUDIO,
+      });
+
+      if (response && response.success) {
+        console.log('Meditation audio stopped successfully');
+      } else {
+        console.error('Failed to stop meditation audio:', response?.error);
+      }
+    } catch (error) {
+      console.error('Error stopping meditation audio:', error);
+      // 不抛出错误，因为停止音频失败不应该阻止其他操作
+    }
+  }
+
+  /**
+   * 获取冥想场景音频URL
+   */
+  private async getMeditationAudioUrl(scene: string): Promise<string> {
+    try {
+      // 首先尝试从用户配置中获取自定义音频URL
+      const meditationConfig = await meditationStorage.get();
+      const customAudioUrls = (meditationConfig as any).customAudioUrls || {};
+
+      // 如果用户配置了自定义URL，优先使用
+      if (customAudioUrls[scene]) {
+        console.log(`Using custom audio URL for scene ${scene}:`, customAudioUrls[scene]);
+        return customAudioUrls[scene];
+      }
+
+      // 默认音频文件映射（用户可以将音频文件放到这些路径）
+      const audioMap: Record<string, string> = {
+        forest: 'meditation/forest.mp3',
+        ocean: 'meditation/ocean.mp3',
+        rain: 'meditation/rain.mp3',
+        birds: 'meditation/birds.mp3',
+        cafe: 'meditation/cafe.mp3',
+        library: 'meditation/library.mp3',
+        white_noise: 'meditation/white_noise.mp3',
+        temple: 'meditation/temple.mp3',
+        singing_bowl: 'meditation/singing_bowl.mp3',
+        silent: '', // 静音场景不需要音频
+      };
+
+      const audioFile = audioMap[scene];
+      if (!audioFile) {
+        // 如果没有对应的音频文件，返回空字符串（静音）
+        console.warn(`No audio file found for scene: ${scene}, will be silent`);
+        return '';
+      }
+
+      return chrome.runtime.getURL(audioFile);
+    } catch (error) {
+      console.error('Error getting meditation audio URL:', error);
+      return ''; // 出错时返回静音
     }
   }
 

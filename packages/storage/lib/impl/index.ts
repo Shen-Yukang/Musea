@@ -9,3 +9,4 @@ export * from './voiceCacheStorage.js';
 export * from './characterStorage.js';
 export * from './mcpConfigStorage.js';
 export * from './speechChatConfigStorage.js';
+export * from './meditationStorage.js';

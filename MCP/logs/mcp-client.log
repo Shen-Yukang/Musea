@@ -223,3 +223,13 @@
 {"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749527256711_wwqm1uinx","timestamp":"2025-06-10T03:47:36.853Z"}
 {"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749527256711_wwqm1uinx","timestamp":"2025-06-10T03:47:36.853Z"}
 {"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-10T03:47:36.853Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-12T19:53:10.590Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-12T19:53:10.595Z"}
+{"command":"general_research","level":"info","message":"Processing request","query":"播放音乐","requestId":"req_1749757990307_yl7vlzo66","timestamp":"2025-06-12T19:53:10.597Z"}
+{"intent":{"action":"play_music","params":{"query":"general_research 播放音乐"}},"level":"debug","message":"Parsed intent","requestId":"req_1749757990307_yl7vlzo66","timestamp":"2025-06-12T19:53:10.597Z"}
+{"level":"info","message":"Playing music","query":"general_research 播放音乐","timestamp":"2025-06-12T19:53:10.598Z"}
+{"level":"debug","message":"Builtin tools initialized","timestamp":"2025-06-13T20:49:10.033Z","tools":["play_music","chrome_search","open_app","system_info"]}
+{"level":"info","message":"MCP Client initialized","timestamp":"2025-06-13T20:49:10.035Z"}
+{"command":"system_info","level":"info","message":"Processing request","query":"获取系统信息","requestId":"chrome_test_001","timestamp":"2025-06-13T20:49:10.037Z"}
+{"intent":{"action":"system_info","params":{}},"level":"debug","message":"Parsed intent","requestId":"chrome_test_001","timestamp":"2025-06-13T20:49:10.037Z"}
+{"arch":"arm64","cpus":14,"hostname":"shenyukangdeMacBook-Pro.local","level":"info","loadavg":[2.212890625,2.81298828125,3.15087890625],"memory":{"free":9854091264,"total":38654705664,"used":28800614400},"message":"System info retrieved","nodeVersion":"v22.12.0","platform":"darwin","timestamp":"2025-06-13T20:49:10.037Z","uptime":673507}

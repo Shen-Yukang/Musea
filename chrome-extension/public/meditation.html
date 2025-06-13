@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冥想时间 - 专注大脑管理工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meditation-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+        }
+
+        .meditation-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .scene-info {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+        }
+
+        .timer-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 3rem;
+        }
+
+        .timer-circle {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .timer-background {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 8;
+        }
+
+        .timer-progress {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.8);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 942; /* 2 * π * 150 */
+            stroke-dashoffset: 942;
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 300;
+        }
+
+        .breathing-guide {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .breathing-guide.active {
+            opacity: 1;
+        }
+
+        .breathing-circle {
+            width: 100px;
+            height: 100px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            transition: transform 4s ease-in-out;
+        }
+
+        .breathing-circle.inhale {
+            transform: scale(1.5);
+        }
+
+        .breathing-circle.exhale {
+            transform: scale(1);
+        }
+
+        .breathing-text {
+            font-size: 1.5rem;
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+        }
+
+        .control-btn.primary:hover {
+            background: white;
+        }
+
+        .scene-display {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+
+        .completion-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .completion-content {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .completion-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .completion-stats {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .meditation-container {
+                padding: 1rem;
+            }
+
+            .meditation-title {
+                font-size: 2rem;
+            }
+
+            .timer-container {
+                width: 250px;
+                height: 250px;
+            }
+
+            .timer-text {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="scene-display" id="sceneDisplay">🌲</div>
+    
+    <div class="meditation-container fade-in">
+        <h1 class="meditation-title">冥想时间</h1>
+        <div class="scene-info" id="sceneInfo">森林 - 鸟鸣与树叶沙沙声</div>
+        
+        <div class="timer-container">
+            <svg class="timer-circle" viewBox="0 0 300 300">
+                <circle class="timer-background" cx="150" cy="150" r="150"></circle>
+                <circle class="timer-progress" id="timerProgress" cx="150" cy="150" r="150"></circle>
+            </svg>
+            <div class="timer-text" id="timerText">10:00</div>
+        </div>
+
+        <div class="breathing-guide" id="breathingGuide">
+            <div class="breathing-circle" id="breathingCircle"></div>
+            <div class="breathing-text" id="breathingText">准备开始...</div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="pauseBtn" style="display: none;">暂停</button>
+            <button class="control-btn" id="resumeBtn" style="display: none;">继续</button>
+            <button class="control-btn primary" id="stopBtn">结束冥想</button>
+        </div>
+    </div>
+
+    <!-- 完成提示 -->
+    <div class="completion-message" id="completionMessage">
+        <div class="completion-content">
+            <div class="completion-title">🎉 冥想完成！</div>
+            <div class="completion-stats" id="completionStats">
+                恭喜你完成了 10 分钟的冥想<br>
+                你的大脑得到了很好的放松
+            </div>
+            <button class="control-btn primary" id="closeBtn">关闭</button>
+        </div>
+    </div>
+
+    <script src="meditation.js"></script>
+</body>
+</html>

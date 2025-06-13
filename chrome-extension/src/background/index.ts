@@ -203,6 +203,53 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
   }
 
+  // 处理冥想音频播放请求
+  if (message.type === MESSAGE_TYPES.PLAY_MEDITATION_AUDIO) {
+    audioManager
+      .playMeditationAudio(message.scene, message.volume, message.loop)
+      .then(() => {
+        console.log('[BACKGROUND] Meditation audio started successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        console.error('[BACKGROUND] Meditation audio play error:', error);
+        errorReports.push({
+          context: 'MEDITATION_AUDIO_PLAY',
+          timestamp: new Date().toISOString(),
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+          errorStack: error.stack,
+          source: 'background',
+          additionalInfo: { scene: message.scene, volume: message.volume, loop: message.loop },
+        });
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // 保持消息通道开放以进行异步响应
+  }
+
+  // 处理冥想音频停止请求
+  if (message.type === MESSAGE_TYPES.STOP_MEDITATION_AUDIO) {
+    audioManager
+      .stopMeditationAudio()
+      .then(() => {
+        console.log('[BACKGROUND] Meditation audio stopped successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        console.error('[BACKGROUND] Meditation audio stop error:', error);
+        errorReports.push({
+          context: 'MEDITATION_AUDIO_STOP',
+          timestamp: new Date().toISOString(),
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+          errorStack: error.stack,
+          source: 'background',
+        });
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // 保持消息通道开放以进行异步响应
+  }
+
   // 处理MCP请求
   if (message.type === MESSAGE_TYPES.MCP_REQUEST) {
     handleMCPRequest(message, sender, sendResponse);

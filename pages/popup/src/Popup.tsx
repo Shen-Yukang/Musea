@@ -12,6 +12,7 @@ import {
   TTSSettings,
   SpeechChatSettings,
   CharacterSettings,
+  MeditationSettings,
 } from '@extension/ui';
 import { useEffect } from 'react';
 import { DebugPanel } from './components/DebugPanel';
@@ -90,6 +91,9 @@ const Popup = () => {
         <div className="flex flex-col gap-6">
           {/* 专注时间设置 */}
           <FocusTimer />
+
+          {/* 冥想设置 */}
+          <MeditationSettings />
 
           {/* 虚拟助手设置 */}
           <CharacterSettings />

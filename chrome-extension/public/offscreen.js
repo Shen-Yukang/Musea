@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       timestamp: Date.now(),
       message: 'Offscreen document is ready',
     });
-    return false; // 同步响应
+    return true; // 保持消息通道开放以确保响应能够发送
   }
 
   if (message.type === 'PLAY_NOTIFICATION_SOUND') {
@@ -72,6 +72,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           audioDataLength: message.audioData ? message.audioData.length : 0,
           audioDataPrefix: message.audioData ? message.audioData.substring(0, 50) : 'null',
         });
+        sendResponse({ success: false, error: error.message, errorDetails });
+      });
+    return true; // Keep the message channel open for async response
+  } else if (message.type === 'PLAY_MEDITATION_AUDIO') {
+    playMeditationAudio(message.scene, message.volume, message.loop, message.audioUrl)
+      .then(() => {
+        console.log('[OFFSCREEN] Meditation audio started successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        const errorDetails = logDetailedError('MEDITATION_AUDIO_PLAYBACK', error, {
+          scene: message.scene,
+          volume: message.volume,
+          loop: message.loop,
+          audioUrl: message.audioUrl,
+        });
+        sendResponse({ success: false, error: error.message, errorDetails });
+      });
+    return true; // Keep the message channel open for async response
+  } else if (message.type === 'STOP_MEDITATION_AUDIO') {
+    stopMeditationAudio()
+      .then(() => {
+        console.log('[OFFSCREEN] Meditation audio stopped successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        const errorDetails = logDetailedError('MEDITATION_AUDIO_STOP', error);
         sendResponse({ success: false, error: error.message, errorDetails });
       });
     return true; // Keep the message channel open for async response
@@ -261,3 +288,117 @@ async function playTTSSound(volume, audioData) {
     throw error;
   }
 }
+
+// 冥想音频管理
+let currentMeditationAudio = null;
+
+async function playMeditationAudio(scene, volume, loop, audioUrl) {
+  try {
+    console.log('[OFFSCREEN] Starting meditation audio playback:', {
+      scene,
+      volume,
+      loop,
+      audioUrl,
+    });
+
+    // 停止当前播放的冥想音频
+    if (currentMeditationAudio) {
+      await stopMeditationAudio();
+    }
+
+    // 静音场景不需要播放音频
+    if (scene === 'silent' || !audioUrl) {
+      console.log('[OFFSCREEN] Silent meditation scene, no audio to play');
+      return;
+    }
+
+    // 验证音量范围
+    if (volume < 0 || volume > 1) {
+      console.warn('[OFFSCREEN] Volume out of range, clamping:', volume);
+      volume = Math.max(0, Math.min(1, volume));
+    }
+
+    // 创建音频对象
+    const audio = new Audio(audioUrl);
+    audio.volume = volume;
+    audio.loop = loop;
+
+    // 添加事件监听器
+    audio.addEventListener('loadstart', () => console.log('[MEDITATION AUDIO] Load start'));
+    audio.addEventListener('loadeddata', () => console.log('[MEDITATION AUDIO] Loaded data'));
+    audio.addEventListener('canplay', () => console.log('[MEDITATION AUDIO] Can play'));
+    audio.addEventListener('playing', () => console.log('[MEDITATION AUDIO] Playing'));
+    audio.addEventListener('ended', () => {
+      console.log('[MEDITATION AUDIO] Ended');
+      if (currentMeditationAudio === audio) {
+        currentMeditationAudio = null;
+      }
+    });
+
+    audio.addEventListener('error', e => {
+      console.error('[MEDITATION AUDIO] Audio error event:', e);
+      const audioError = e.target.error;
+      logDetailedError('MEDITATION_AUDIO_ERROR_EVENT', new Error('Meditation Audio error event'), {
+        scene,
+        audioError: audioError
+          ? {
+              code: audioError.code,
+              message: audioError.message,
+            }
+          : null,
+        audioSrc: e.target.src,
+        audioReadyState: e.target.readyState,
+        audioNetworkState: e.target.networkState,
+      });
+
+      if (currentMeditationAudio === audio) {
+        currentMeditationAudio = null;
+      }
+    });
+
+    // 播放音频
+    await audio.play();
+    currentMeditationAudio = audio;
+
+    console.log('[OFFSCREEN] Meditation audio started successfully:', {
+      scene,
+      volume,
+      loop,
+      duration: audio.duration,
+    });
+  } catch (error) {
+    console.error('[OFFSCREEN] Failed to play meditation audio:', error);
+    logDetailedError('MEDITATION_AUDIO_PLAY_FAILED', error, {
+      scene,
+      volume,
+      loop,
+      audioUrl,
+    });
+    throw error;
+  }
+}
+
+async function stopMeditationAudio() {
+  try {
+    if (currentMeditationAudio) {
+      console.log('[OFFSCREEN] Stopping meditation audio');
+
+      // 停止播放
+      currentMeditationAudio.pause();
+      currentMeditationAudio.currentTime = 0;
+
+      // 清理引用
+      currentMeditationAudio = null;
+
+      console.log('[OFFSCREEN] Meditation audio stopped successfully');
+    } else {
+      console.log('[OFFSCREEN] No meditation audio to stop');
+    }
+  } catch (error) {
+    console.error('[OFFSCREEN] Failed to stop meditation audio:', error);
+    logDetailedError('MEDITATION_AUDIO_STOP_FAILED', error);
+    throw error;
+  }
+}
+
+
