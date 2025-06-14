@@ -364,28 +364,44 @@ export class AudioManager {
         return customAudioUrls[scene];
       }
 
-      // 默认音频文件映射（用户可以将音频文件放到这些路径）
-      const audioMap: Record<string, string> = {
-        forest: 'meditation/forest.mp3',
-        ocean: 'meditation/ocean.mp3',
-        rain: 'meditation/rain.mp3',
-        birds: 'meditation/birds.mp3',
-        cafe: 'meditation/cafe.mp3',
-        library: 'meditation/library.mp3',
-        white_noise: 'meditation/white_noise.mp3',
-        temple: 'meditation/temple.mp3',
-        singing_bowl: 'meditation/singing_bowl.mp3',
-        silent: '', // 静音场景不需要音频
+      // 默认音频文件映射（支持多种格式，优先级：OGG > MP3 > WAV）
+      const audioMap: Record<string, string[]> = {
+        forest: ['meditation/forest.ogg', 'meditation/forest.mp3', 'meditation/forest.wav'],
+        ocean: ['meditation/ocean.ogg', 'meditation/ocean.mp3', 'meditation/ocean.wav'],
+        rain: ['meditation/rain.ogg', 'meditation/rain.mp3', 'meditation/rain.wav'],
+        birds: ['meditation/birds.ogg', 'meditation/birds.mp3', 'meditation/birds.wav'],
+        cafe: ['meditation/cafe.ogg', 'meditation/cafe.mp3', 'meditation/cafe.wav'],
+        library: ['meditation/library.ogg', 'meditation/library.mp3', 'meditation/library.wav'],
+        white_noise: ['meditation/white_noise.ogg', 'meditation/white_noise.mp3', 'meditation/white_noise.wav'],
+        temple: ['meditation/temple.ogg', 'meditation/temple.mp3', 'meditation/temple.wav'],
+        singing_bowl: ['meditation/singing_bowl.ogg', 'meditation/singing_bowl.mp3', 'meditation/singing_bowl.wav'],
+        silent: [], // 静音场景不需要音频
       };
 
-      const audioFile = audioMap[scene];
-      if (!audioFile) {
+      const audioFiles = audioMap[scene];
+      if (!audioFiles || audioFiles.length === 0) {
         // 如果没有对应的音频文件，返回空字符串（静音）
         console.warn(`No audio file found for scene: ${scene}, will be silent`);
         return '';
       }
 
-      return chrome.runtime.getURL(audioFile);
+      // 尝试找到第一个可用的音频文件
+      // 优先级：OGG > MP3 > WAV
+      for (const audioFile of audioFiles) {
+        try {
+          // 检查文件是否存在（通过尝试获取URL）
+          const audioUrl = chrome.runtime.getURL(audioFile);
+          console.log(`Trying audio file for scene ${scene}: ${audioFile}`);
+          return audioUrl;
+        } catch (error) {
+          console.warn(`Audio file not available: ${audioFile}`);
+          continue;
+        }
+      }
+
+      // 如果所有文件都不可用，返回空字符串（静音）
+      console.warn(`No available audio files found for scene: ${scene}, will be silent`);
+      return '';
     } catch (error) {
       console.error('Error getting meditation audio URL:', error);
       return ''; // 出错时返回静音
