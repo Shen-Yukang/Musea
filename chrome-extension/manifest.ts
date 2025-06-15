@@ -30,7 +30,7 @@ const manifest = {
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
   host_permissions: ['<all_urls>'],
-  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'offscreen', 'nativeMessaging'],
+  permissions: ['storage', 'scripting', 'tabs', 'notifications', 'offscreen', 'nativeMessaging', 'sidePanel'],
   background: {
     service_worker: 'background.js',
     type: 'module',
@@ -77,7 +77,6 @@ const manifest = {
         'meditation.js',
         'tailwind.min.js',
         'chart.min.js',
-        // Content scripts resources
         'content/index.iife.js',
         'content/index.iife_dev.js',
         'content/index.iife_dev.js.map',
@@ -88,12 +87,9 @@ const manifest = {
         'content-ui/logo.svg',
         'content-runtime/index.iife.js',
         'content-runtime/index.iife.js.map',
-        // HMR and development resources (critical for dev mode)
         'refresh.js',
         'hot.js',
-        // CSS files
         'content.css',
-        // Popup assets (in case needed)
         'popup/assets/*',
         'popup/logo_vertical.svg',
         'popup/logo_vertical_dark.svg',
@@ -101,6 +97,9 @@ const manifest = {
       matches: ['<all_urls>'],
     },
   ],
+  side_panel: {
+    default_path: 'side-panel/index.html',
+  },
 } satisfies chrome.runtime.ManifestV3;
 
 export default manifest;

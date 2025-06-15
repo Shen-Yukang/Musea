@@ -74,6 +74,7 @@ export const STORAGE_KEYS = {
   CHARACTER_CHAT_HISTORY: 'character-chat-history-storage-key',
   MCP_CONFIG: 'mcp-config-storage-key',
   MCP_TASK_HISTORY: 'mcp-task-history-storage-key',
+  DOM_CONFIG: 'dom-config-storage-key',
 } as const;
 
 // MCP相关常量

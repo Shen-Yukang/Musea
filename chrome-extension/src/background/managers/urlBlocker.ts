@@ -1,5 +1,6 @@
-import { blockedUrlsStorage, focusStorage } from '@extension/storage';
+import { blockedUrlsStorage, focusStorage, domConfigStorage } from '@extension/storage';
 import { getSiteHandler, type SiteHandler, siteHandlers } from '../site-handlers.js';
+import { DOMEngine } from '../domEngine.js';
 
 export class UrlBlocker {
   private static instance: UrlBlocker;
@@ -103,33 +104,34 @@ export class UrlBlocker {
           return matches;
         }
 
-        // 域名匹配逻辑
+        // 域名匹配逻辑 - 更严格的匹配规则
         // 1. 精确匹配
         const exactMatch = domain === cleanBlockedUrl;
 
-        // 2. 子域名匹配 (www.example.com 匹配 example.com)
-        const subdomainMatch = domain.endsWith('.' + cleanBlockedUrl);
+        // 2. 子域名匹配 (sub.example.com 匹配 example.com)
+        // 只有当前域名是真正的子域名时才匹配，排除www前缀情况
+        const subdomainMatch =
+          domain.endsWith('.' + cleanBlockedUrl) && domain !== cleanBlockedUrl && !domain.startsWith('www.');
 
-        // 3. 父域名匹配 (example.com 匹配 www.example.com)
-        const parentDomainMatch = cleanBlockedUrl.endsWith('.' + domain);
+        // 3. www前缀匹配 - 只在特定情况下允许
+        // 当配置的是无www版本，当前访问的是www版本时匹配
+        // 或者当配置的是www版本，当前访问的是无www版本时匹配
+        let wwwMatch = false;
+        if (domain.startsWith('www.') && !cleanBlockedUrl.startsWith('www.')) {
+          // 当前是www版本，配置是无www版本
+          wwwMatch = domain.substring(4) === cleanBlockedUrl;
+        } else if (!domain.startsWith('www.') && cleanBlockedUrl.startsWith('www.')) {
+          // 当前是无www版本，配置是www版本
+          wwwMatch = domain === cleanBlockedUrl.substring(4);
+        }
 
-        // 4. 移除 www 前缀后的匹配
-        const domainWithoutWww = domain.startsWith('www.') ? domain.substring(4) : domain;
-        const cleanBlockedUrlWithoutWww = cleanBlockedUrl.startsWith('www.')
-          ? cleanBlockedUrl.substring(4)
-          : cleanBlockedUrl;
-        const wwwMatch = domainWithoutWww === cleanBlockedUrlWithoutWww;
-
-        const matches = exactMatch || subdomainMatch || parentDomainMatch || wwwMatch;
+        const matches = exactMatch || subdomainMatch || wwwMatch;
 
         console.log('UrlBlocker: Domain match result:', {
           domain,
           cleanBlockedUrl,
-          domainWithoutWww,
-          cleanBlockedUrlWithoutWww,
           exactMatch,
           subdomainMatch,
-          parentDomainMatch,
           wwwMatch,
           finalResult: matches,
         });
@@ -173,7 +175,56 @@ export class UrlBlocker {
       console.log('UrlBlocker: Handling study mode for URL:', url);
       console.log('UrlBlocker: Domain:', domain);
 
-      // 首先检查是否有预设的网站处理器
+      // 首先检查DOM配置系统
+      const domConfig = await domConfigStorage.get();
+
+      if (domConfig.globalSettings.enabled) {
+        const siteConfig = domConfig.sites.find(site => {
+          let configDomain = site.domain;
+
+          // 如果配置的域名包含协议，提取纯域名
+          if (configDomain.startsWith('http://') || configDomain.startsWith('https://')) {
+            try {
+              configDomain = new URL(configDomain).hostname;
+            } catch {
+              // 如果URL解析失败，手动提取域名
+              configDomain = configDomain.replace(/^https?:\/\//, '').split('/')[0];
+            }
+          }
+
+          // 移除末尾的斜杠
+          configDomain = configDomain.replace(/\/$/, '');
+
+          // 使用与UrlBlocker一致的严格匹配逻辑
+          // 1. 精确匹配
+          const exactMatch = domain === configDomain;
+
+          // 2. 子域名匹配 (sub.example.com 匹配 example.com)
+          // 只有当前域名是真正的子域名时才匹配，排除www前缀情况
+          const subdomainMatch =
+            domain.endsWith('.' + configDomain) && domain !== configDomain && !domain.startsWith('www.');
+
+          // 3. www前缀匹配
+          let wwwMatch = false;
+          if (domain.startsWith('www.') && !configDomain.startsWith('www.')) {
+            // 当前是www版本，配置是无www版本
+            wwwMatch = domain.substring(4) === configDomain;
+          } else if (!domain.startsWith('www.') && configDomain.startsWith('www.')) {
+            // 当前是无www版本，配置是www版本
+            wwwMatch = domain === configDomain.substring(4);
+          }
+
+          return exactMatch || subdomainMatch || wwwMatch;
+        });
+
+        if (siteConfig && siteConfig.enabled) {
+          console.log('UrlBlocker: Found DOM config for domain:', siteConfig.domain);
+          await DOMEngine.applySiteConfig(tabId, siteConfig);
+          return;
+        }
+      }
+
+      // 降级到预设的网站处理器
       const siteHandler = getSiteHandler(url);
 
       if (siteHandler) {
@@ -182,9 +233,9 @@ export class UrlBlocker {
         return;
       }
 
-      console.log('UrlBlocker: No predefined site handler found, checking user selectors');
+      console.log('UrlBlocker: No DOM config or predefined handler found, checking user selectors');
 
-      // 如果没有预设处理器，使用用户配置的选择器
+      // 如果没有DOM配置或预设处理器，使用用户配置的选择器
       const selectors = studyModeSelectors[domain] || [];
 
       console.log('UrlBlocker: User selectors for domain:', domain, selectors);

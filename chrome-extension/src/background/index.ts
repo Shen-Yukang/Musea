@@ -5,6 +5,8 @@ import { AudioManager } from './managers/audioManager.js';
 import { UrlBlocker } from './managers/urlBlocker.js';
 import { MESSAGE_TYPES, MCP, ERROR_MESSAGES } from '../constants/index.js';
 import { TTSService } from '../services/ttsService.js';
+import { DOMEngine } from './domEngine.js';
+import { notifyDOMReapply } from './intelligentDOMWatcher.js';
 
 // Native messaging 连接管理
 let mcpPort: chrome.runtime.Port | null = null;
@@ -256,6 +258,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // 保持消息通道开放以进行异步响应
   }
 
+  // 处理DOM重新应用请求
+  if (message.type === 'TRIGGER_DOM_REAPPLY') {
+    if (sender.tab?.id) {
+      notifyDOMReapply(sender.tab.id)
+        .then(() => sendResponse({ success: true }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+    } else {
+      sendResponse({ success: false, error: 'No tab ID available' });
+    }
+    return true; // 保持消息通道开放以进行异步响应
+  }
+
   return false;
 });
 
@@ -329,41 +343,78 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
 
 // 监听标签页更新
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  console.log('🔄 [Background] Tab updated:', {
+    tabId,
+    status: changeInfo.status,
+    url: tab.url,
+    changeInfo,
+  });
+
   if (changeInfo.status === 'complete' && tab.url) {
+    console.log('🎯 [Background] Calling urlBlocker.checkTabUrl for:', tab.url);
     await urlBlocker.checkTabUrl(tabId, tab.url);
+  } else {
+    console.log('🔄 [Background] Skipping URL check - status:', changeInfo.status, 'url:', !!tab.url);
   }
 });
 
 // 监听标签页激活
 chrome.tabs.onActivated.addListener(async activeInfo => {
+  console.log('🔄 [Background] Tab activated:', activeInfo);
+
   try {
     const tab = await chrome.tabs.get(activeInfo.tabId);
+    console.log('🔄 [Background] Active tab info:', {
+      tabId: activeInfo.tabId,
+      url: tab.url,
+      status: tab.status,
+    });
+
     if (tab.url) {
+      console.log('🎯 [Background] Calling urlBlocker.checkTabUrl for activated tab:', tab.url);
       await urlBlocker.checkTabUrl(activeInfo.tabId, tab.url);
+    } else {
+      console.log('🔄 [Background] Skipping URL check for activated tab - no URL');
     }
   } catch (error) {
-    console.error('Error handling tab activation:', error);
+    console.error('🚨 [Background] Error handling tab activation:', error);
+  }
+});
+
+// 监听标签页关闭
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  console.log('🔄 [Background] Tab removed:', { tabId, removeInfo });
+
+  // 清理DOM引擎相关状态
+  try {
+    DOMEngine.cleanupTab(tabId);
+  } catch (error) {
+    console.error('🚨 [Background] Error cleaning up DOM engine state:', error);
   }
 });
 
 // 初始化
 async function initialize() {
   try {
-    console.log('Initializing background script...');
+    console.log('🚀 [Background] Starting background script initialization...');
+    console.log('🚀 [Background] Chrome runtime ID:', chrome.runtime.id);
+    console.log('🚀 [Background] URL Blocker instance:', urlBlocker);
 
     // 初始化主题
     const theme = await exampleThemeStorage.get();
-    console.log('Theme loaded:', theme);
+    console.log('🚀 [Background] Theme loaded:', theme);
 
     // 初始化专注管理器
     await focusManager.initialize();
+    console.log('🚀 [Background] Focus manager initialized');
 
     // 初始化预设网站处理器
     await urlBlocker.initializePredefinedSites();
+    console.log('🚀 [Background] URL blocker initialized');
 
-    console.log('Background script initialized successfully');
+    console.log('✅ [Background] Background script initialized successfully');
   } catch (error) {
-    console.error('Error during initialization:', error);
+    console.error('🚨 [Background] Error during initialization:', error);
   }
 }
 
