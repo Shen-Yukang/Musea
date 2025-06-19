@@ -102,6 +102,32 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ success: false, error: error.message, errorDetails });
       });
     return true; // Keep the message channel open for async response
+  } else if (message.type === 'PLAY_BACKGROUND_MUSIC') {
+    playBackgroundMusic(message.volume, message.loop, message.audioUrl)
+      .then(() => {
+        console.log('[OFFSCREEN] Background music started successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        const errorDetails = logDetailedError('BACKGROUND_MUSIC_PLAYBACK', error, {
+          volume: message.volume,
+          loop: message.loop,
+          audioUrl: message.audioUrl,
+        });
+        sendResponse({ success: false, error: error.message, errorDetails });
+      });
+    return true; // Keep the message channel open for async response
+  } else if (message.type === 'STOP_BACKGROUND_MUSIC') {
+    stopBackgroundMusic()
+      .then(() => {
+        console.log('[OFFSCREEN] Background music stopped successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        const errorDetails = logDetailedError('BACKGROUND_MUSIC_STOP', error);
+        sendResponse({ success: false, error: error.message, errorDetails });
+      });
+    return true; // Keep the message channel open for async response
   }
 });
 
@@ -292,6 +318,9 @@ async function playTTSSound(volume, audioData) {
 // 冥想音频管理
 let currentMeditationAudio = null;
 
+// 背景音乐管理
+let currentBackgroundMusic = null;
+
 async function playMeditationAudio(scene, volume, loop, audioUrl) {
   try {
     console.log('[OFFSCREEN] Starting meditation audio playback:', {
@@ -401,4 +430,108 @@ async function stopMeditationAudio() {
   }
 }
 
+// 背景音乐管理函数
+async function playBackgroundMusic(volume, loop, audioUrl) {
+  try {
+    console.log('[OFFSCREEN] Starting background music playback:', {
+      volume,
+      loop,
+      audioUrl,
+    });
 
+    // 停止当前播放的背景音乐
+    if (currentBackgroundMusic) {
+      await stopBackgroundMusic();
+    }
+
+    // 如果没有音频URL，直接返回
+    if (!audioUrl) {
+      console.log('[OFFSCREEN] No audio URL provided for background music');
+      return;
+    }
+
+    // 验证音量范围
+    if (volume < 0 || volume > 1) {
+      console.warn('[OFFSCREEN] Volume out of range, clamping:', volume);
+      volume = Math.max(0, Math.min(1, volume));
+    }
+
+    // 创建音频对象
+    const audio = new Audio(audioUrl);
+    audio.volume = volume;
+    audio.loop = loop;
+
+    // 添加事件监听器
+    audio.addEventListener('loadstart', () => console.log('[BACKGROUND MUSIC] Load start'));
+    audio.addEventListener('loadeddata', () => console.log('[BACKGROUND MUSIC] Loaded data'));
+    audio.addEventListener('canplay', () => console.log('[BACKGROUND MUSIC] Can play'));
+    audio.addEventListener('playing', () => console.log('[BACKGROUND MUSIC] Playing'));
+    audio.addEventListener('ended', () => {
+      console.log('[BACKGROUND MUSIC] Ended');
+      if (currentBackgroundMusic === audio) {
+        currentBackgroundMusic = null;
+      }
+    });
+
+    audio.addEventListener('error', e => {
+      console.error('[BACKGROUND MUSIC] Audio error event:', e);
+      const audioError = e.target.error;
+      logDetailedError('BACKGROUND_MUSIC_ERROR_EVENT', new Error('Background Music error event'), {
+        audioError: audioError
+          ? {
+              code: audioError.code,
+              message: audioError.message,
+            }
+          : null,
+        audioSrc: e.target.src,
+        audioReadyState: e.target.readyState,
+        audioNetworkState: e.target.networkState,
+      });
+
+      if (currentBackgroundMusic === audio) {
+        currentBackgroundMusic = null;
+      }
+    });
+
+    // 播放音频
+    await audio.play();
+    currentBackgroundMusic = audio;
+
+    console.log('[OFFSCREEN] Background music started successfully:', {
+      volume,
+      loop,
+      duration: audio.duration,
+    });
+  } catch (error) {
+    console.error('[OFFSCREEN] Failed to play background music:', error);
+    logDetailedError('BACKGROUND_MUSIC_PLAY_FAILED', error, {
+      volume,
+      loop,
+      audioUrl,
+    });
+    throw error;
+  }
+}
+
+async function stopBackgroundMusic() {
+  try {
+    if (currentBackgroundMusic) {
+      console.log('[OFFSCREEN] Stopping background music');
+
+      // 停止播放
+      currentBackgroundMusic.pause();
+      currentBackgroundMusic.currentTime = 0;
+
+      // 清理引用
+      currentBackgroundMusic = null;
+
+      console.log('[OFFSCREEN] Background music stopped successfully');
+    } else {
+      console.log('[OFFSCREEN] No background music to stop');
+    }
+  } catch (error) {
+    console.error('[OFFSCREEN] Failed to stop background music:', error);
+    logDetailedError('BACKGROUND_MUSIC_STOP_FAILED', error);
+    throw error;
+  }
+}

@@ -252,6 +252,52 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // 保持消息通道开放以进行异步响应
   }
 
+  // 处理背景音乐播放请求
+  if (message.type === MESSAGE_TYPES.PLAY_BACKGROUND_MUSIC) {
+    audioManager
+      .playBackgroundMusic()
+      .then(() => {
+        console.log('[BACKGROUND] Background music started successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        console.error('[BACKGROUND] Background music play error:', error);
+        errorReports.push({
+          context: 'BACKGROUND_MUSIC_PLAY',
+          timestamp: new Date().toISOString(),
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+          errorStack: error.stack,
+          source: 'background',
+        });
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // 保持消息通道开放以进行异步响应
+  }
+
+  // 处理背景音乐停止请求
+  if (message.type === MESSAGE_TYPES.STOP_BACKGROUND_MUSIC) {
+    audioManager
+      .stopBackgroundMusic()
+      .then(() => {
+        console.log('[BACKGROUND] Background music stopped successfully');
+        sendResponse({ success: true });
+      })
+      .catch(error => {
+        console.error('[BACKGROUND] Background music stop error:', error);
+        errorReports.push({
+          context: 'BACKGROUND_MUSIC_STOP',
+          timestamp: new Date().toISOString(),
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+          errorStack: error.stack,
+          source: 'background',
+        });
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // 保持消息通道开放以进行异步响应
+  }
+
   // 处理MCP请求
   if (message.type === MESSAGE_TYPES.MCP_REQUEST) {
     handleMCPRequest(message, sender, sendResponse);

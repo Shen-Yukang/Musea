@@ -39,6 +39,14 @@ export class FocusManager {
       // 播放TTS语音通知
       await AudioManager.getInstance().playTTSNotification(startMessage);
 
+      // 播放背景音乐（如果启用）
+      try {
+        await AudioManager.getInstance().playBackgroundMusic();
+      } catch (error) {
+        console.warn('Failed to start background music:', error);
+        // 背景音乐播放失败不应该阻止专注模式启动
+      }
+
       // 设置徽章
       chrome.action.setBadgeText({ text: FOCUS.BADGE_TEXT });
       chrome.action.setBadgeBackgroundColor({ color: FOCUS.BADGE_COLOR });
@@ -65,6 +73,14 @@ export class FocusManager {
   async stopFocus(): Promise<void> {
     try {
       await focusStorage.stopFocus();
+
+      // 停止背景音乐
+      try {
+        await AudioManager.getInstance().stopBackgroundMusic();
+      } catch (error) {
+        console.warn('Failed to stop background music:', error);
+        // 背景音乐停止失败不应该阻止专注模式停止
+      }
 
       // 清除徽章
       chrome.action.setBadgeText({ text: '' });

@@ -5,11 +5,12 @@ import { ToggleButton } from '@extension/ui';
 import { useState } from 'react';
 import { DOMConfigManager } from './components/DOMConfigManager';
 import { TestPage } from './components/TestPage';
+import { BackgroundMusicSettings } from './components/BackgroundMusicSettings';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const domConfig = useStorage(domConfigStorage);
-  const [activeTab, setActiveTab] = useState<'sites' | 'global' | 'presets' | 'test'>('sites');
+  const [activeTab, setActiveTab] = useState<'sites' | 'global' | 'presets' | 'music' | 'test'>('sites');
 
   const isLight = theme === 'light';
 
@@ -29,6 +30,7 @@ const SidePanel = () => {
               { key: 'sites', label: '网站配置' },
               { key: 'global', label: '全局设置' },
               { key: 'presets', label: '预设模板' },
+              { key: 'music', label: '背景音乐' },
               { key: 'test', label: '测试调试' },
             ].map(tab => (
               <button
@@ -54,6 +56,8 @@ const SidePanel = () => {
       <main className="p-4">
         {activeTab === 'test' ? (
           <TestPage isLight={isLight} />
+        ) : activeTab === 'music' ? (
+          <BackgroundMusicSettings isLight={isLight} />
         ) : (
           <DOMConfigManager activeTab={activeTab} domConfig={domConfig} isLight={isLight} />
         )}

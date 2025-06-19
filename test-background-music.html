@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Background Music Test</title>
+</head>
+<body>
+    <h1>Background Music Feature Test</h1>
+    
+    <h2>Test Steps:</h2>
+    <ol>
+        <li>Load the extension in Chrome (chrome://extensions/)</li>
+        <li>Open the side panel</li>
+        <li>Click on "背景音乐" tab</li>
+        <li>Toggle "Enable" to activate background music</li>
+        <li>Select a meditation scene (e.g., 森林)</li>
+        <li>Click "🎵 测试播放 (3秒)" to test</li>
+        <li>Start a focus session from popup</li>
+        <li>Verify background music plays during focus</li>
+        <li>Stop focus session and verify music stops</li>
+    </ol>
+
+    <h2>Expected Behavior:</h2>
+    <ul>
+        <li>✅ No errors about undefined backgroundMusic</li>
+        <li>✅ Background music settings UI loads correctly</li>
+        <li>✅ Test playback works for 3 seconds</li>
+        <li>✅ Music starts automatically with focus mode</li>
+        <li>✅ Music stops automatically when focus ends</li>
+        <li>✅ Volume control works</li>
+        <li>✅ Scene selection works</li>
+        <li>✅ Custom URL input works</li>
+    </ul>
+
+    <h2>Fixed Issues:</h2>
+    <ul>
+        <li>✅ TypeError: Cannot read properties of undefined (reading 'enabled')</li>
+        <li>✅ TypeError: Cannot read properties of undefined (reading 'customUrl')</li>
+        <li>✅ Added backward compatibility for existing users</li>
+        <li>✅ Added automatic migration to default background music config</li>
+    </ul>
+
+    <script>
+        console.log('Background Music Test Page Loaded');
+        console.log('Check the extension side panel for the new "背景音乐" tab');
+    </script>
+</body>
+</html>

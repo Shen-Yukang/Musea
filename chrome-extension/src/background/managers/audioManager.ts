@@ -1,4 +1,10 @@
-import { soundSettingsStorage, ttsConfigStorage, voiceCacheStorage, meditationStorage } from '@extension/storage';
+import {
+  soundSettingsStorage,
+  ttsConfigStorage,
+  voiceCacheStorage,
+  meditationStorage,
+  focusStorage,
+} from '@extension/storage';
 import { TTSTextProcessor, TTSCacheManager, TTSErrorHandler } from '@extension/shared';
 import { TTSService } from '../../services/ttsService.js';
 import { TIMEOUTS, MESSAGE_TYPES, ERROR_MESSAGES } from '../../constants/index.js';
@@ -405,6 +411,88 @@ export class AudioManager {
     } catch (error) {
       console.error('Error getting meditation audio URL:', error);
       return ''; // 出错时返回静音
+    }
+  }
+
+  /**
+   * 播放专注背景音乐
+   */
+  async playBackgroundMusic(): Promise<void> {
+    try {
+      const focusConfig = await focusStorage.get();
+      const backgroundMusic = focusConfig.backgroundMusic;
+
+      // Handle case where backgroundMusic config doesn't exist (for existing users)
+      if (!backgroundMusic) {
+        console.log('Background music config not found, skipping');
+        return;
+      }
+
+      if (!backgroundMusic.enabled) {
+        console.log('Background music is disabled');
+        return;
+      }
+
+      console.log('Starting background music:', backgroundMusic);
+
+      // 使用offscreen document来播放音频
+      await this.ensureOffscreenDocument();
+
+      let audioUrl = '';
+
+      if (backgroundMusic.source === 'meditation' && backgroundMusic.meditationScene) {
+        // 使用冥想场景音频
+        audioUrl = await this.getMeditationAudioUrl(backgroundMusic.meditationScene);
+      } else if (backgroundMusic.source === 'custom' && backgroundMusic.customUrl) {
+        // 使用自定义URL
+        audioUrl = backgroundMusic.customUrl;
+      }
+
+      if (!audioUrl) {
+        console.warn('No audio URL available for background music');
+        return;
+      }
+
+      // 向offscreen document发送播放背景音乐的消息
+      const response = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.PLAY_BACKGROUND_MUSIC,
+        volume: backgroundMusic.volume,
+        loop: backgroundMusic.loop,
+        audioUrl,
+      });
+
+      if (response && response.success) {
+        console.log('Background music started successfully');
+      } else {
+        console.error('Failed to play background music:', response?.error);
+        throw new Error(response?.error || 'Failed to play background music');
+      }
+    } catch (error) {
+      console.error('Error playing background music:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 停止专注背景音乐
+   */
+  async stopBackgroundMusic(): Promise<void> {
+    try {
+      console.log('Stopping background music');
+
+      // 向offscreen document发送停止背景音乐的消息
+      const response = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.STOP_BACKGROUND_MUSIC,
+      });
+
+      if (response && response.success) {
+        console.log('Background music stopped successfully');
+      } else {
+        console.error('Failed to stop background music:', response?.error);
+      }
+    } catch (error) {
+      console.error('Error stopping background music:', error);
+      // 不抛出错误，因为停止音频失败不应该阻止其他操作
     }
   }
 
