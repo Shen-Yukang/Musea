@@ -372,7 +372,7 @@ export class AudioManager {
 
       // 默认音频文件映射（支持多种格式，优先级：OGG > MP3 > WAV）
       const audioMap: Record<string, string[]> = {
-        forest: ['meditation/forest.ogg', 'meditation/forest.mp3', 'meditation/forest.wav'],
+        forest: ['meditation/forest.mp3', 'meditation/forest.ogg', 'meditation/forest.wav'],
         ocean: ['meditation/ocean.ogg', 'meditation/ocean.mp3', 'meditation/ocean.wav'],
         rain: ['meditation/rain.ogg', 'meditation/rain.mp3', 'meditation/rain.wav'],
         birds: ['meditation/birds.ogg', 'meditation/birds.mp3', 'meditation/birds.wav'],
