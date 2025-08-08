@@ -1,9 +1,10 @@
-import { blockedUrlsStorage, focusStorage, domConfigStorage } from '@extension/storage';
+import { blockedUrlsStorage, focusStorage, domConfigStorage, visitMonitorStorage } from '@extension/storage';
 import { getSiteHandler, type SiteHandler, siteHandlers } from '../site-handlers.js';
 import { DOMEngine } from '../domEngine.js';
 
 export class UrlBlocker {
   private static instance: UrlBlocker;
+  private visitStartTimes: Map<string, number> = new Map(); // 记录访问开始时间
 
   private constructor() {}
 
@@ -21,34 +22,54 @@ export class UrlBlocker {
     try {
       console.log('UrlBlocker: Checking tab URL:', url);
 
-      // 获取专注状态
-      const focusConfig = await focusStorage.get();
-      console.log('UrlBlocker: Focus config:', focusConfig);
-
-      if (!focusConfig.isActive) {
-        console.log('UrlBlocker: Focus mode not active, skipping URL check');
-        return; // 非专注模式下不进行URL检查
-      }
+      // 记录访问开始时间
+      const tabKey = `${tabId}-${url}`;
+      this.visitStartTimes.set(tabKey, Date.now());
 
       // 获取阻止的URL列表
       const blockedConfig = await blockedUrlsStorage.get();
       console.log('UrlBlocker: Blocked config:', blockedConfig);
 
-      // 检查是否为完全阻止的URL
+      // 检查是否为被监控的URL（阻止列表或学习模式列表）
       const isBlocked = this.isUrlBlocked(url, blockedConfig.urls);
-      console.log('UrlBlocker: Is blocked?', isBlocked);
+      const isStudyMode = this.isUrlBlocked(url, blockedConfig.studyModeUrls);
+      const isMonitored = isBlocked || isStudyMode;
 
-      // 如果是完全阻止的URL，显示警告页面
-      if (isBlocked) {
-        console.log('UrlBlocker: Blocking URL:', url);
-        await this.showBlockedWarning(tabId, url);
-        return; // 完全阻止的URL不再继续处理....--------stop
+      // 如果是被监控的URL，立即记录访问并检查阈值（不管专注模式是否开启）
+      if (isMonitored) {
+        console.log('UrlBlocker: Monitored URL detected, recording visit:', url);
+        await this.recordVisitForMonitoring(url, isBlocked);
+
+        // 检查是否超过阈值，如果超过则直接跳转到深呼吸页面
+        const thresholdCheck = await visitMonitorStorage.checkThreshold(url);
+        if (thresholdCheck.exceeded) {
+          console.log('UrlBlocker: Threshold exceeded, redirecting to deep breathing page:', thresholdCheck.reason);
+          await this.showDeepBreathingPage(tabId, url, thresholdCheck.reason);
+          return; // 已经处理，直接返回
+        }
       }
 
-      // 检查是否为学习模式URL
-      const isStudyMode = this.isUrlBlocked(url, blockedConfig.studyModeUrls);
+      // 获取专注状态
+      const focusConfig = await focusStorage.get();
+      console.log('UrlBlocker: Focus config:', focusConfig);
+
+      if (!focusConfig.isActive) {
+        console.log('UrlBlocker: Focus mode not active, skipping URL blocking');
+        return; // 非专注模式下不进行URL阻止，但已经记录了访问
+      }
+
+      // 专注模式下的URL处理
+      console.log('UrlBlocker: Is blocked?', isBlocked);
       console.log('UrlBlocker: Is study mode?', isStudyMode);
 
+      // 如果是完全阻止的URL，检查阈值并显示相应页面
+      if (isBlocked) {
+        console.log('UrlBlocker: Blocking URL:', url);
+        await this.handleBlockedUrlWithThreshold(tabId, url);
+        return;
+      }
+
+      // 如果是学习模式URL，应用DOM修改
       if (isStudyMode) {
         console.log('UrlBlocker: Applying study mode to URL:', url);
         await this.handleStudyModeUrl(tabId, url, blockedConfig.studyModeSelectors);
@@ -144,6 +165,94 @@ export class UrlBlocker {
     } catch (error) {
       console.error('Error checking if URL is blocked:', error);
       return false;
+    }
+  }
+
+  /**
+   * 记录访问用于监控（不管专注模式是否开启）
+   */
+  private async recordVisitForMonitoring(url: string, isBlocked: boolean): Promise<void> {
+    try {
+      // 记录访问（初始时长为1秒，确保统计正确更新）
+      await visitMonitorStorage.recordVisit(url, 1000, isBlocked);
+      console.log('UrlBlocker: Visit recorded for monitoring:', url);
+    } catch (error) {
+      console.error('Error recording visit for monitoring:', error);
+    }
+  }
+
+  /**
+   * 处理被阻止的URL并检查阈值
+   */
+  private async handleBlockedUrlWithThreshold(tabId: number, url: string): Promise<void> {
+    try {
+      // 检查是否超过阈值
+      const thresholdCheck = await visitMonitorStorage.checkThreshold(url);
+
+      if (thresholdCheck.exceeded) {
+        console.log('UrlBlocker: Threshold exceeded, redirecting to deep breathing page:', thresholdCheck.reason);
+        await this.showDeepBreathingPage(tabId, url, thresholdCheck.reason);
+      } else {
+        // 正常显示阻止页面
+        await this.showBlockedWarning(tabId, url);
+      }
+    } catch (error) {
+      console.error('Error handling blocked URL with threshold:', error);
+      // 出错时显示正常阻止页面
+      await this.showBlockedWarning(tabId, url);
+    }
+  }
+
+  /**
+   * 记录访问并检查阈值（保留用于兼容性）
+   */
+  private async recordVisitAndCheckThreshold(tabId: number, url: string, isBlocked: boolean): Promise<void> {
+    try {
+      // 计算访问时长
+      const tabKey = `${tabId}-${url}`;
+      const startTime = this.visitStartTimes.get(tabKey) || Date.now();
+      const duration = Date.now() - startTime;
+
+      // 记录访问
+      await visitMonitorStorage.recordVisit(url, duration, isBlocked);
+
+      // 检查是否超过阈值
+      const thresholdCheck = await visitMonitorStorage.checkThreshold(url);
+
+      if (thresholdCheck.exceeded) {
+        console.log('UrlBlocker: Threshold exceeded, redirecting to deep breathing page:', thresholdCheck.reason);
+        await this.showDeepBreathingPage(tabId, url, thresholdCheck.reason);
+      } else {
+        // 正常显示阻止页面
+        await this.showBlockedWarning(tabId, url);
+      }
+
+      // 清理访问时间记录
+      this.visitStartTimes.delete(tabKey);
+    } catch (error) {
+      console.error('Error recording visit and checking threshold:', error);
+      // 出错时显示正常阻止页面
+      await this.showBlockedWarning(tabId, url);
+    }
+  }
+
+  /**
+   * 显示深呼吸页面
+   */
+  private async showDeepBreathingPage(tabId: number, url: string, reason: string): Promise<void> {
+    try {
+      const breathingUrl =
+        chrome.runtime.getURL('deep-breathing.html') +
+        '?url=' +
+        encodeURIComponent(url) +
+        '&reason=' +
+        encodeURIComponent(reason);
+      await chrome.tabs.update(tabId, { url: breathingUrl });
+      console.log('Redirected to deep breathing page:', url, reason);
+    } catch (error) {
+      console.error('Error showing deep breathing page:', error);
+      // 出错时显示正常阻止页面
+      await this.showBlockedWarning(tabId, url);
     }
   }
 
@@ -393,6 +502,69 @@ export class UrlBlocker {
   }
 
   /**
+   * 处理标签页关闭或切换，记录访问时长
+   */
+  async handleTabLeave(tabId: number, url: string): Promise<void> {
+    try {
+      const tabKey = `${tabId}-${url}`;
+      const startTime = this.visitStartTimes.get(tabKey);
+
+      if (startTime) {
+        const duration = Date.now() - startTime;
+
+        // 检查是否为被监控的URL
+        const blockedConfig = await blockedUrlsStorage.get();
+        const isBlocked = this.isUrlBlocked(url, blockedConfig.urls);
+        const isStudyMode = this.isUrlBlocked(url, blockedConfig.studyModeUrls);
+
+        if (isBlocked || isStudyMode) {
+          // 更新访问时长（如果之前已经记录过访问，这里会更新时长）
+          await visitMonitorStorage.recordVisit(url, duration, isBlocked);
+          console.log('UrlBlocker: Updated visit duration:', url, `${Math.round(duration / 1000)}s`);
+        }
+
+        // 清理记录
+        this.visitStartTimes.delete(tabKey);
+      }
+    } catch (error) {
+      console.error('Error handling tab leave:', error);
+    }
+  }
+
+  /**
+   * 处理标签页URL变化，记录之前URL的访问时长
+   */
+  async handleTabUrlChange(tabId: number, oldUrl: string, newUrl: string): Promise<void> {
+    try {
+      // 先处理旧URL的离开
+      if (oldUrl) {
+        await this.handleTabLeave(tabId, oldUrl);
+      }
+
+      // 然后开始记录新URL
+      if (newUrl) {
+        const tabKey = `${tabId}-${newUrl}`;
+        this.visitStartTimes.set(tabKey, Date.now());
+        console.log('UrlBlocker: Started tracking new URL:', newUrl);
+      }
+    } catch (error) {
+      console.error('Error handling tab URL change:', error);
+    }
+  }
+
+  /**
+   * 清理访问监控数据
+   */
+  async cleanupVisitData(): Promise<void> {
+    try {
+      await visitMonitorStorage.cleanupOldRecords();
+      console.log('UrlBlocker: Visit data cleanup completed');
+    } catch (error) {
+      console.error('Error cleaning up visit data:', error);
+    }
+  }
+
+  /**
    * 初始化预设网站处理器
    * 自动将有预设处理器的网站添加到学习模式列表
    */
@@ -427,8 +599,24 @@ export class UrlBlocker {
       // 输出最终配置用于调试
       const finalConfig = await blockedUrlsStorage.get();
       console.log('UrlBlocker: Final config after initialization:', finalConfig);
+
+      // 启动定期清理任务
+      this.startPeriodicCleanup();
     } catch (error) {
       console.error('Error initializing predefined sites:', error);
     }
+  }
+
+  /**
+   * 启动定期清理任务
+   */
+  private startPeriodicCleanup(): void {
+    // 每小时清理一次旧数据
+    setInterval(
+      async () => {
+        await this.cleanupVisitData();
+      },
+      60 * 60 * 1000,
+    ); // 1小时
   }
 }

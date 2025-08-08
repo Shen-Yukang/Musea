@@ -387,23 +387,6 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
   }
 });
 
-// 监听标签页更新
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  console.log('🔄 [Background] Tab updated:', {
-    tabId,
-    status: changeInfo.status,
-    url: tab.url,
-    changeInfo,
-  });
-
-  if (changeInfo.status === 'complete' && tab.url) {
-    console.log('🎯 [Background] Calling urlBlocker.checkTabUrl for:', tab.url);
-    await urlBlocker.checkTabUrl(tabId, tab.url);
-  } else {
-    console.log('🔄 [Background] Skipping URL check - status:', changeInfo.status, 'url:', !!tab.url);
-  }
-});
-
 // 监听标签页激活
 chrome.tabs.onActivated.addListener(async activeInfo => {
   console.log('🔄 [Background] Tab activated:', activeInfo);
@@ -417,6 +400,8 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
     });
 
     if (tab.url) {
+      // 记录当前激活的标签页URL
+      tabUrls.set(activeInfo.tabId, tab.url);
       console.log('🎯 [Background] Calling urlBlocker.checkTabUrl for activated tab:', tab.url);
       await urlBlocker.checkTabUrl(activeInfo.tabId, tab.url);
     } else {
@@ -424,6 +409,56 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
     }
   } catch (error) {
     console.error('🚨 [Background] Error handling tab activation:', error);
+  }
+});
+
+// 存储标签页的当前URL，用于跟踪URL变化
+const tabUrls = new Map<number, string>();
+
+// 监听标签页关闭
+chrome.tabs.onRemoved.addListener(async (tabId, removeInfo) => {
+  console.log('🔄 [Background] Tab removed:', { tabId, removeInfo });
+
+  try {
+    // 获取标签页的最后URL并记录访问时长
+    const lastUrl = tabUrls.get(tabId);
+    if (lastUrl) {
+      console.log('🔄 [Background] Recording final visit for closed tab:', lastUrl);
+      await urlBlocker.handleTabLeave(tabId, lastUrl);
+      tabUrls.delete(tabId);
+    }
+  } catch (error) {
+    console.error('🚨 [Background] Error handling tab removal:', error);
+  }
+});
+
+// 监听标签页URL变化（用于记录离开时间）
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  console.log('🔄 [Background] Tab updated:', {
+    tabId,
+    status: changeInfo.status,
+    url: tab.url,
+    changeInfo,
+  });
+
+  // 如果URL发生变化，记录之前URL的访问时长
+  if (changeInfo.url && tab.url) {
+    const oldUrl = tabUrls.get(tabId);
+    if (oldUrl && oldUrl !== tab.url) {
+      console.log('🔄 [Background] URL changed from', oldUrl, 'to', tab.url);
+      await urlBlocker.handleTabUrlChange(tabId, oldUrl, tab.url);
+    }
+    // 更新标签页URL记录
+    tabUrls.set(tabId, tab.url);
+  }
+
+  if (changeInfo.status === 'complete' && tab.url) {
+    console.log('🎯 [Background] Calling urlBlocker.checkTabUrl for:', tab.url);
+    // 确保记录当前URL
+    tabUrls.set(tabId, tab.url);
+    await urlBlocker.checkTabUrl(tabId, tab.url);
+  } else {
+    console.log('🔄 [Background] Skipping URL check - status:', changeInfo.status, 'url:', !!tab.url);
   }
 });
 
@@ -458,10 +493,30 @@ async function initialize() {
     await urlBlocker.initializePredefinedSites();
     console.log('🚀 [Background] URL blocker initialized');
 
+    // 启动访问监控数据清理任务
+    startPeriodicCleanup();
+    console.log('🚀 [Background] Visit monitor cleanup task started');
+
     console.log('✅ [Background] Background script initialized successfully');
   } catch (error) {
     console.error('🚨 [Background] Error during initialization:', error);
   }
+}
+
+// 启动定期清理任务
+function startPeriodicCleanup() {
+  // 每小时清理一次旧的访问记录
+  setInterval(
+    async () => {
+      try {
+        await urlBlocker.cleanupVisitData();
+        console.log('🧹 [Background] Periodic visit data cleanup completed');
+      } catch (error) {
+        console.error('🚨 [Background] Error during periodic cleanup:', error);
+      }
+    },
+    60 * 60 * 1000,
+  ); // 1小时
 }
 
 /**

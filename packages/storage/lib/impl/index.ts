@@ -11,4 +11,4 @@ export * from './mcpConfigStorage.js';
 export * from './speechChatConfigStorage.js';
 export * from './meditationStorage.js';
 export * from './domConfigStorage.js';
-export * from './domConfigStorage.js';
+export * from './visitMonitorStorage.js';

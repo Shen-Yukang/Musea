@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深呼吸 - 重新专注</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 0.5s forwards;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 1s forwards;
+        }
+
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            margin: 0 auto 3rem;
+            position: relative;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 1.5s forwards;
+        }
+
+        .breathing-circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        .breathing-text {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 2s forwards;
+        }
+
+        .custom-message {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 2.5s forwards;
+        }
+
+        .camera-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 3s forwards;
+        }
+
+        .camera-preview {
+            width: 300px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 1rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .camera-placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 3.5s forwards;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn.primary {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-in-out 4s forwards;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        .reason-display {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-particles" id="particles"></div>
+    
+    <div class="container">
+        <h1 class="title">深呼吸时间</h1>
+        <p class="subtitle">让我们一起放慢节奏，重新专注</p>
+        
+        <div class="reason-display" id="reasonDisplay">
+            <!-- 阈值超过原因将在这里显示 -->
+        </div>
+        
+        <div class="breathing-circle"></div>
+        
+        <div class="breathing-text" id="breathingText">
+            准备开始深呼吸...
+        </div>
+        
+        <div class="timer" id="timer">
+            剩余时间: 5:00
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="custom-message" id="customMessage">
+            <!-- 自定义消息将在这里显示 -->
+        </div>
+        
+        <div class="camera-section">
+            <h3>专注监控</h3>
+            <p>启用摄像头来帮助您保持专注状态</p>
+            <div class="camera-preview" id="cameraPreview">
+                <div class="camera-placeholder">点击下方按钮启用摄像头</div>
+            </div>
+            <button class="btn" id="cameraBtn" onclick="toggleCamera()">启用摄像头</button>
+        </div>
+        
+        <div class="controls">
+            <button class="btn primary" id="startBtn" onclick="startBreathing()">开始深呼吸</button>
+            <button class="btn" id="skipBtn" onclick="skipBreathing()">跳过 (10秒后可用)</button>
+            <button class="btn" id="settingsBtn" onclick="openSettings()">设置</button>
+        </div>
+    </div>
+
+    <script src="deep-breathing.js"></script>
+</body>
+</html>

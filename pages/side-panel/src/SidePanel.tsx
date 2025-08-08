@@ -6,11 +6,12 @@ import { useState } from 'react';
 import { DOMConfigManager } from './components/DOMConfigManager';
 import { TestPage } from './components/TestPage';
 import { BackgroundMusicSettings } from './components/BackgroundMusicSettings';
+import { VisitMonitorSettings } from './components/VisitMonitorSettings';
 
 const SidePanel = () => {
   const theme = useStorage(exampleThemeStorage);
   const domConfig = useStorage(domConfigStorage);
-  const [activeTab, setActiveTab] = useState<'sites' | 'global' | 'presets' | 'music' | 'test'>('sites');
+  const [activeTab, setActiveTab] = useState<'sites' | 'global' | 'presets' | 'music' | 'monitor' | 'test'>('sites');
 
   const isLight = theme === 'light';
 
@@ -31,6 +32,7 @@ const SidePanel = () => {
               { key: 'global', label: '全局设置' },
               { key: 'presets', label: '预设模板' },
               { key: 'music', label: '背景音乐' },
+              { key: 'monitor', label: '访问监控' },
               { key: 'test', label: '测试调试' },
             ].map(tab => (
               <button
@@ -58,6 +60,8 @@ const SidePanel = () => {
           <TestPage isLight={isLight} />
         ) : activeTab === 'music' ? (
           <BackgroundMusicSettings isLight={isLight} />
+        ) : activeTab === 'monitor' ? (
+          <VisitMonitorSettings isLight={isLight} />
         ) : (
           <DOMConfigManager activeTab={activeTab} domConfig={domConfig} isLight={isLight} />
         )}

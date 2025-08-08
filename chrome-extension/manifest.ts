@@ -75,6 +75,8 @@ const manifest = {
         'brain-guide.js',
         'meditation.html',
         'meditation.js',
+        'deep-breathing.html',
+        'deep-breathing.js',
         'tailwind.min.js',
         'chart.min.js',
         'content/index.iife.js',
