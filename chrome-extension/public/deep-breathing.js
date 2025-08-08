@@ -19,14 +19,19 @@ class DeepBreathingSession {
     // 加载自定义消息
     await this.loadCustomMessage();
 
-    // 创建浮动粒子
-    this.createFloatingParticles();
+    // 初始化摄像头
+    await this.initCamera();
 
-    // 初始化跳过按钮状态
-    this.initSkipButton();
+    // 初始化关闭按钮状态
+    this.initCloseButton();
 
     // 显示阈值超过原因
     this.displayReason();
+
+    // 等待2秒后自动开始呼吸引导
+    setTimeout(() => {
+      this.startBreathing();
+    }, 2000);
   }
 
   parseUrlParams() {
@@ -60,79 +65,98 @@ class DeepBreathingSession {
     }
   }
 
-  createFloatingParticles() {
-    const particlesContainer = document.getElementById('particles');
-    const particleCount = 20;
+  async initCamera() {
+    try {
+      // 自动启用摄像头作为背景
+      this.cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 1920, height: 1080 },
+        audio: false,
+      });
 
-    for (let i = 0; i < particleCount; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 6 + 's';
-      particle.style.animationDuration = 4 + Math.random() * 4 + 's';
-      particlesContainer.appendChild(particle);
+      // 创建video元素作为背景
+      const video = document.createElement('video');
+      video.srcObject = this.cameraStream;
+      video.autoplay = true;
+      video.muted = true;
+      video.id = 'backgroundVideo';
+
+      // 添加到页面背景
+      document.body.appendChild(video);
+
+      console.log('Camera enabled as background');
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      // 如果无法访问摄像头，使用默认背景
+      document.body.classList.add('fallback-background');
     }
   }
 
-  initSkipButton() {
-    const skipBtn = document.getElementById('skipBtn');
-    skipBtn.disabled = true;
-    skipBtn.style.opacity = '0.5';
-    skipBtn.style.cursor = 'not-allowed';
+  initCloseButton() {
+    const closeBtn = document.getElementById('closeBtn');
+    if (!closeBtn) {
+      console.error('Close button not found');
+      return;
+    }
 
-    // 10秒后启用跳过按钮
+    // 绑定点击事件
+    closeBtn.addEventListener('click', () => this.closeBreathing());
+
+    closeBtn.disabled = true;
+    closeBtn.style.opacity = '0.5';
+    closeBtn.style.cursor = 'not-allowed';
+
+    // 10秒后启用关闭按钮
     setTimeout(() => {
-      skipBtn.disabled = false;
-      skipBtn.style.opacity = '1';
-      skipBtn.style.cursor = 'pointer';
-      skipBtn.textContent = '跳过';
+      if (closeBtn) {
+        closeBtn.disabled = false;
+        closeBtn.style.opacity = '1';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.textContent = '关闭';
+      }
     }, 10000);
   }
 
-  async toggleCamera() {
-    const cameraBtn = document.getElementById('cameraBtn');
-    const cameraPreview = document.getElementById('cameraPreview');
-
-    if (!this.cameraStream) {
-      try {
-        // 请求摄像头权限
-        this.cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 300, height: 200 },
-          audio: false,
-        });
-
-        // 创建video元素
-        const video = document.createElement('video');
-        video.srcObject = this.cameraStream;
-        video.autoplay = true;
-        video.muted = true;
-
-        // 清空预览区域并添加视频
-        cameraPreview.innerHTML = '';
-        cameraPreview.appendChild(video);
-
-        cameraBtn.textContent = '关闭摄像头';
-        console.log('Camera enabled for focus monitoring');
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        alert('无法访问摄像头，请检查权限设置');
-      }
-    } else {
-      // 关闭摄像头
-      this.cameraStream.getTracks().forEach(track => track.stop());
-      this.cameraStream = null;
-
-      cameraPreview.innerHTML = '<div class="camera-placeholder">摄像头已关闭</div>';
-      cameraBtn.textContent = '启用摄像头';
+  ensureCloseButtonWorks() {
+    const closeBtn = document.getElementById('closeBtn');
+    if (closeBtn) {
+      // 确保关闭按钮的点击事件正常工作
+      closeBtn.addEventListener('click', () => this.closeBreathing());
+      console.log('Close button event handler attached');
     }
+  }
+
+  closeBreathing() {
+    console.log('closeBreathing called');
+    const closeBtn = document.getElementById('closeBtn');
+
+    if (!closeBtn) {
+      console.error('Close button not found');
+      return;
+    }
+
+    if (closeBtn.disabled) {
+      console.log('Close button is disabled');
+      return;
+    }
+
+    console.log('Closing breathing session');
+    this.goBack();
   }
 
   startBreathing() {
     if (this.isActive) return;
 
     this.isActive = true;
-    document.getElementById('startBtn').textContent = '进行中...';
-    document.getElementById('startBtn').disabled = true;
+
+    // 隐藏开始界面，显示呼吸引导
+    const startSection = document.getElementById('startSection');
+    const breathingGuide = document.getElementById('breathingGuide');
+
+    if (startSection) startSection.style.display = 'none';
+    breathingGuide.classList.add('active');
+
+    // 确保关闭按钮在呼吸开始后仍然可用
+    this.ensureCloseButtonWorks();
 
     // 开始呼吸引导
     this.startBreathingGuide();
@@ -141,7 +165,6 @@ class DeepBreathingSession {
     this.sessionTimer = setInterval(() => {
       this.remainingTime--;
       this.updateTimer();
-      this.updateProgress();
 
       if (this.remainingTime <= 0) {
         this.completeSession();
@@ -151,39 +174,65 @@ class DeepBreathingSession {
 
   startBreathingGuide() {
     const breathingText = document.getElementById('breathingText');
+    const breathingCircle = document.getElementById('breathingCircle');
+    const countdownNumber = document.getElementById('countdownNumber');
+
+    // 4-7-8 呼吸法：吸气4秒，屏息7秒，呼气8秒
     const phases = [
-      { text: '慢慢吸气...', duration: 4000, phase: 'inhale' },
-      { text: '屏住呼吸...', duration: 2000, phase: 'hold' },
-      { text: '慢慢呼气...', duration: 6000, phase: 'exhale' },
+      { text: 'Breathe In', duration: 4, phase: 'inhale', countdown: 'down' },
+      { text: 'Hold On', duration: 7, phase: 'hold', countdown: 'up' },
+      { text: 'Breathe Out', duration: 8, phase: 'exhale', countdown: 'up' },
     ];
 
     let currentPhaseIndex = 0;
 
-    const cycleBreathing = () => {
+    const runPhase = () => {
       if (!this.isActive) return;
 
       const currentPhase = phases[currentPhaseIndex];
       breathingText.textContent = currentPhase.text;
       this.breathingPhase = currentPhase.phase;
 
-      setTimeout(() => {
+      // 更新呼吸圆圈的动画状态
+      breathingCircle.className = `breathing-circle ${currentPhase.phase}`;
+
+      // 运行倒计时
+      this.runCountdown(currentPhase, () => {
         currentPhaseIndex = (currentPhaseIndex + 1) % phases.length;
-        cycleBreathing();
-      }, currentPhase.duration);
+        runPhase();
+      });
     };
 
-    cycleBreathing();
+    runPhase();
+  }
+
+  runCountdown(phase, callback) {
+    const countdownNumber = document.getElementById('countdownNumber');
+    let count = phase.countdown === 'down' ? phase.duration : 1;
+    const target = phase.countdown === 'down' ? 1 : phase.duration;
+    const increment = phase.countdown === 'down' ? -1 : 1;
+
+    const updateCount = () => {
+      if (!this.isActive) return;
+
+      countdownNumber.textContent = count;
+
+      if (count === target) {
+        setTimeout(callback, 1000);
+        return;
+      }
+
+      count += increment;
+      setTimeout(updateCount, 1000);
+    };
+
+    updateCount();
   }
 
   updateTimer() {
     const minutes = Math.floor(this.remainingTime / 60);
     const seconds = this.remainingTime % 60;
     document.getElementById('timer').textContent = `剩余时间: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
-
-  updateProgress() {
-    const progress = ((this.duration - this.remainingTime) / this.duration) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
   }
 
   completeSession() {
@@ -197,30 +246,15 @@ class DeepBreathingSession {
     // 显示完成消息
     document.getElementById('breathingText').textContent = '深呼吸完成！您现在可以继续专注工作了。';
     document.getElementById('timer').textContent = '会话完成';
+    document.getElementById('countdownNumber').textContent = '✓';
 
-    // 更新按钮
-    const startBtn = document.getElementById('startBtn');
-    startBtn.textContent = '返回';
-    startBtn.disabled = false;
-    startBtn.onclick = () => this.goBack();
-
-    // 关闭摄像头
-    if (this.cameraStream) {
-      this.cameraStream.getTracks().forEach(track => track.stop());
-    }
+    // 移除呼吸圆圈的动画状态
+    document.getElementById('breathingCircle').className = 'breathing-circle';
 
     // 3秒后自动返回
     setTimeout(() => {
       this.goBack();
     }, 3000);
-  }
-
-  skipBreathing() {
-    if (document.getElementById('skipBtn').disabled) {
-      return;
-    }
-
-    this.goBack();
   }
 
   goBack() {
@@ -244,28 +278,21 @@ class DeepBreathingSession {
   }
 }
 
-// 全局函数供HTML调用
+// 页面加载完成后初始化
 let breathingSession;
 
-function startBreathing() {
-  breathingSession.startBreathing();
-}
-
-function skipBreathing() {
-  breathingSession.skipBreathing();
-}
-
-function toggleCamera() {
-  breathingSession.toggleCamera();
-}
-
-function openSettings() {
-  breathingSession.openSettings();
-}
-
-// 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
   breathingSession = new DeepBreathingSession();
+
+  // 绑定开始按钮事件
+  const startBtn = document.getElementById('startBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => {
+      if (breathingSession) {
+        breathingSession.startBreathing();
+      }
+    });
+  }
 });
 
 // 页面卸载时清理资源

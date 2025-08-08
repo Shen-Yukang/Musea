@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试深呼吸页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f0f0f0;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .test-link {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+        .test-link:hover {
+            background: #0056b3;
+        }
+        .description {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>深呼吸页面测试</h1>
+        
+        <div class="description">
+            <h3>新功能特点：</h3>
+            <ul>
+                <li>✅ 4-7-8 呼吸法（吸气4秒，屏息7秒，呼气8秒）</li>
+                <li>✅ 摄像头作为背景（完全不遮挡）</li>
+                <li>✅ 沉浸式背景动画：从底部升起的半透明层</li>
+                <li>✅ 固定悬浮的数字倒计时和文字提示</li>
+                <li>✅ 背景透明度和模糊度随呼吸节奏变化</li>
+                <li>✅ 数字倒计时反馈（Breathe In 4,3,2,1 → Hold On 1,2,3,4,5,6,7 → Breathe Out 1,2,3,4,5,6,7,8）</li>
+                <li>✅ 自动开始（页面加载2秒后）</li>
+                <li>✅ 数字脉动动画效果</li>
+                <li>✅ 呼吸阶段颜色变化：蓝色(吸气) → 黄色(屏息) → 绿色(呼气)</li>
+            </ul>
+        </div>
+
+        <a href="deep-breathing.html" class="test-link">打开深呼吸页面</a>
+        
+        <div class="description">
+            <h3>测试步骤：</h3>
+            <ol>
+                <li>点击上方链接打开深呼吸页面</li>
+                <li>允许摄像头权限（如果提示）</li>
+                <li>页面会在2秒后自动开始呼吸引导</li>
+                <li>观察数字倒计时：Breathe In 4→3→2→1</li>
+                <li>然后 Hold On 1→2→3→4→5→6→7</li>
+                <li>最后 Breathe Out 1→2→3→4→5→6→7→8</li>
+                <li>观察呼吸圆圈的颜色和大小变化</li>
+                <li>等待10秒后关闭按钮变为可用</li>
+                <li>测试关闭功能</li>
+            </ol>
+        </div>
+
+        <div class="description">
+            <h3>预期效果：</h3>
+            <ul>
+                <li>背景完全显示摄像头画面，无任何遮挡</li>
+                <li>呼吸时从底部升起半透明彩色层，配合blur效果</li>
+                <li>中心固定显示超大号数字倒计时，提供精确的时间反馈</li>
+                <li>文字提示固定悬浮显示当前呼吸阶段（英文）</li>
+                <li>数字每秒脉动一次，增强视觉反馈</li>
+                <li>吸气时蓝色层从底部升起，屏息时变黄色并增强模糊，呼气时绿色层下降并变透明</li>
+                <li>整体界面极简，完全专注于呼吸体验</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
