@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每日重置功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 14px;
+        }
+        
+        .button:hover {
+            background: #0056CC;
+        }
+        
+        .button.danger {
+            background: #FF3B30;
+        }
+        
+        .button.danger:hover {
+            background: #D70015;
+        }
+        
+        .info {
+            background: #f0f8ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #007AFF;
+        }
+        
+        .result {
+            background: #f8f8f8;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕰️ 每日重置功能测试</h1>
+        
+        <div class="info">
+            <h3>功能说明：</h3>
+            <p>新的每日重置机制基于<strong>早上7点</strong>进行重置，而不是24小时滚动窗口。</p>
+            <ul>
+                <li>✅ 每天早上7点自动重置访问记录和统计</li>
+                <li>✅ 用户第一次打开浏览器时检查是否需要重置</li>
+                <li>✅ 每小时定期检查重置（防止用户不在7点打开浏览器）</li>
+                <li>✅ 避免了24小时滚动窗口的计算复杂性</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>📊 当前状态检查</h3>
+            <button class="button" onclick="checkCurrentStatus()">检查当前状态</button>
+            <div id="currentStatus"></div>
+        </div>
+
+        <div class="section">
+            <h3>🧪 重置功能测试</h3>
+            <button class="button" onclick="testDailyReset()">测试每日重置逻辑</button>
+            <button class="button" onclick="simulateOldData()">模拟旧数据</button>
+            <button class="button danger" onclick="manualReset()">手动重置数据</button>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="section">
+            <h3>📈 访问记录模拟</h3>
+            <button class="button" onclick="addTestVisits()">添加测试访问记录</button>
+            <button class="button" onclick="showAllStats()">显示所有统计</button>
+            <div id="visitResults"></div>
+        </div>
+
+        <div class="section">
+            <h3>⏰ 时间计算验证</h3>
+            <button class="button" onclick="showTimeCalculations()">显示时间计算</button>
+            <div id="timeResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟访问监控存储（简化版本）
+        const mockStorage = {
+            data: {
+                enabled: true,
+                maxVisitsPerDay: 5,
+                maxDurationPerDay: 15,
+                customMessage: '您今天已经过度浏览了这些网站，让我们一起深呼吸，重新专注吧！',
+                records: [],
+                stats: {},
+                lastCleanup: Date.now(),
+                lastDailyReset: Date.now() - 25 * 60 * 60 * 1000, // 25小时前
+            },
+            
+            get: function() {
+                return Promise.resolve(this.data);
+            },
+            
+            set: function(updater) {
+                if (typeof updater === 'function') {
+                    this.data = updater(this.data);
+                } else {
+                    this.data = { ...this.data, ...updater };
+                }
+                return Promise.resolve();
+            }
+        };
+
+        // 每日重置逻辑（复制自实际代码）
+        async function checkAndPerformDailyReset() {
+            const now = Date.now();
+            const config = await mockStorage.get();
+            
+            // 获取今天早上7点的时间戳
+            const today = new Date();
+            const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+            
+            // 如果现在还没到今天早上7点，使用昨天早上7点
+            if (now < todayAt7AM.getTime()) {
+                todayAt7AM.setDate(todayAt7AM.getDate() - 1);
+            }
+            
+            const resetTime = todayAt7AM.getTime();
+            
+            // 检查是否需要重置（上次重置时间早于今天早上7点）
+            if (config.lastDailyReset < resetTime) {
+                console.log('VisitMonitor: Performing daily reset at 7AM. Last reset:', new Date(config.lastDailyReset), 'Reset time:', new Date(resetTime));
+                
+                await mockStorage.set((current) => ({
+                    ...current,
+                    records: [],
+                    stats: {},
+                    lastDailyReset: now,
+                    lastCleanup: now,
+                }));
+                
+                console.log('VisitMonitor: Daily reset completed');
+                return true; // 表示执行了重置
+            }
+            
+            return false; // 表示没有执行重置
+        }
+
+        // 检查当前状态
+        async function checkCurrentStatus() {
+            const config = await mockStorage.get();
+            const now = new Date();
+            const lastReset = new Date(config.lastDailyReset);
+            
+            const today = new Date();
+            const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+            if (now < todayAt7AM.getTime()) {
+                todayAt7AM.setDate(todayAt7AM.getDate() - 1);
+            }
+            
+            const shouldReset = config.lastDailyReset < todayAt7AM.getTime();
+            
+            const html = `
+                <div class="result">
+当前时间: ${now.toLocaleString()}
+上次重置: ${lastReset.toLocaleString()}
+今日7点: ${todayAt7AM.toLocaleString()}
+访问记录数: ${config.records.length}
+统计站点数: ${Object.keys(config.stats).length}
+                </div>
+                <div class="status ${shouldReset ? 'warning' : 'success'}">
+                    ${shouldReset ? '⚠️ 需要重置' : '✅ 无需重置'}
+                </div>
+            `;
+            
+            document.getElementById('currentStatus').innerHTML = html;
+        }
+
+        // 测试每日重置
+        async function testDailyReset() {
+            const resetPerformed = await checkAndPerformDailyReset();
+            const config = await mockStorage.get();
+            
+            const html = `
+                <div class="result">
+重置执行: ${resetPerformed ? '是' : '否'}
+重置后记录数: ${config.records.length}
+重置后统计数: ${Object.keys(config.stats).length}
+新的重置时间: ${new Date(config.lastDailyReset).toLocaleString()}
+                </div>
+                <div class="status ${resetPerformed ? 'success' : 'warning'}">
+                    ${resetPerformed ? '✅ 重置成功' : '⚠️ 无需重置'}
+                </div>
+            `;
+            
+            document.getElementById('testResults').innerHTML = html;
+        }
+
+        // 模拟旧数据
+        async function simulateOldData() {
+            const yesterday = Date.now() - 25 * 60 * 60 * 1000; // 25小时前
+            
+            await mockStorage.set((current) => ({
+                ...current,
+                lastDailyReset: yesterday,
+                records: [
+                    { url: 'https://example.com', timestamp: yesterday + 1000, duration: 5000, isBlocked: false },
+                    { url: 'https://test.com', timestamp: yesterday + 2000, duration: 3000, isBlocked: true }
+                ],
+                stats: {
+                    'example.com': { url: 'example.com', visitCount: 3, totalDuration: 15000, lastVisit: yesterday + 1000, firstVisit: yesterday },
+                    'test.com': { url: 'test.com', visitCount: 2, totalDuration: 8000, lastVisit: yesterday + 2000, firstVisit: yesterday }
+                }
+            }));
+            
+            document.getElementById('testResults').innerHTML = `
+                <div class="status success">✅ 已模拟25小时前的旧数据</div>
+            `;
+        }
+
+        // 手动重置
+        async function manualReset() {
+            await mockStorage.set((current) => ({
+                ...current,
+                records: [],
+                stats: {},
+                lastDailyReset: Date.now(),
+                lastCleanup: Date.now(),
+            }));
+            
+            document.getElementById('testResults').innerHTML = `
+                <div class="status success">✅ 手动重置完成</div>
+            `;
+        }
+
+        // 添加测试访问记录
+        async function addTestVisits() {
+            const now = Date.now();
+            const testSites = ['baidu.com', 'zhihu.com', 'bilibili.com'];
+            
+            for (let i = 0; i < testSites.length; i++) {
+                const site = testSites[i];
+                await mockStorage.set((current) => {
+                    const newRecord = {
+                        url: `https://${site}`,
+                        timestamp: now - i * 1000,
+                        duration: (i + 1) * 2000,
+                        isBlocked: i % 2 === 0
+                    };
+                    
+                    const updatedRecords = [...current.records, newRecord];
+                    const stats = { ...current.stats };
+                    
+                    if (!stats[site]) {
+                        stats[site] = {
+                            url: site,
+                            visitCount: 0,
+                            totalDuration: 0,
+                            lastVisit: now,
+                            firstVisit: now,
+                        };
+                    }
+                    
+                    stats[site].visitCount++;
+                    stats[site].totalDuration += newRecord.duration;
+                    stats[site].lastVisit = newRecord.timestamp;
+                    
+                    return {
+                        ...current,
+                        records: updatedRecords,
+                        stats
+                    };
+                });
+            }
+            
+            document.getElementById('visitResults').innerHTML = `
+                <div class="status success">✅ 已添加 ${testSites.length} 个测试访问记录</div>
+            `;
+        }
+
+        // 显示所有统计
+        async function showAllStats() {
+            const config = await mockStorage.get();
+            
+            let html = '<div class="result">';
+            html += `总记录数: ${config.records.length}\n`;
+            html += `统计站点数: ${Object.keys(config.stats).length}\n\n`;
+            
+            if (Object.keys(config.stats).length > 0) {
+                html += '站点统计:\n';
+                for (const [domain, stats] of Object.entries(config.stats)) {
+                    html += `  ${domain}: ${stats.visitCount}次访问, ${Math.round(stats.totalDuration/1000)}秒\n`;
+                }
+            }
+            
+            html += '</div>';
+            document.getElementById('visitResults').innerHTML = html;
+        }
+
+        // 显示时间计算
+        function showTimeCalculations() {
+            const now = new Date();
+            const today = new Date();
+            const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+            
+            let resetTime = todayAt7AM;
+            if (now < todayAt7AM.getTime()) {
+                resetTime = new Date(todayAt7AM);
+                resetTime.setDate(resetTime.getDate() - 1);
+            }
+            
+            const nextReset = new Date(todayAt7AM);
+            if (now >= todayAt7AM.getTime()) {
+                nextReset.setDate(nextReset.getDate() + 1);
+            }
+            
+            const html = `
+                <div class="result">
+当前时间: ${now.toLocaleString()}
+今天7点: ${todayAt7AM.toLocaleString()}
+当前重置点: ${resetTime.toLocaleString()}
+下次重置: ${nextReset.toLocaleString()}
+
+时间比较:
+- 现在 < 今天7点: ${now < todayAt7AM.getTime()}
+- 使用的重置时间: ${resetTime.toLocaleString()}
+                </div>
+            `;
+            
+            document.getElementById('timeResults').innerHTML = html;
+        }
+
+        // 页面加载时检查状态
+        window.addEventListener('load', checkCurrentStatus);
+    </script>
+</body>
+</html>

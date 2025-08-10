@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>强制访问监控功能测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .info {
+            background: #f0f8ff;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #007AFF;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        
+        .success {
+            background: #d4edda;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .feature-list li:before {
+            content: "✅ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .removed-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .removed-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .removed-list li:before {
+            content: "❌ ";
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .code {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9rem;
+            border: 1px solid #e9ecef;
+            margin: 1rem 0;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 强制访问监控功能</h1>
+        
+        <div class="info">
+            <h3>🎯 设计目标</h3>
+            <p>让访问监控成为一个<strong>强制性的后台保护机制</strong>，用户不能通过关闭开关来逃避监管，真正起到帮助用户控制上网习惯的作用。</p>
+        </div>
+
+        <div class="section">
+            <h3>✅ 已实现的强制监控特性</h3>
+            <ul class="feature-list">
+                <li><strong>移除开关按钮</strong>：用户无法手动关闭访问监控</li>
+                <li><strong>移除清零功能</strong>：用户无法手动清空访问记录</li>
+                <li><strong>强制启用逻辑</strong>：代码层面忽略用户的enabled设置</li>
+                <li><strong>自动每日重置</strong>：基于早上7点的自动重置机制</li>
+                <li><strong>后台自动运行</strong>：无需用户干预，自动监控和记录</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>❌ 已移除的用户控制功能</h3>
+            <ul class="removed-list">
+                <li><strong>启用/禁用开关</strong>：用户无法关闭监控</li>
+                <li><strong>重置统计按钮</strong>：用户无法清空访问记录</li>
+                <li><strong>清理旧数据按钮</strong>：用户无法手动清理数据</li>
+                <li><strong>数据管理区域</strong>：整个手动数据管理界面已移除</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>🔧 技术实现细节</h3>
+            
+            <h4>1. 存储层强制启用</h4>
+            <div class="code">
+// 默认配置（监控始终启用，不允许用户关闭）
+const defaultConfig: VisitMonitorConfig = {
+  enabled: true, // 强制启用，不允许用户关闭
+  // ...其他配置
+};
+            </div>
+
+            <h4>2. 阈值检查忽略用户设置</h4>
+            <div class="code">
+// 检查是否超过阈值（监控始终启用）
+checkThreshold: async (url: string) => {
+  const config = await visitMonitorBaseStorage.get();
+
+  // 强制启用监控，忽略用户设置
+  // if (!config.enabled) {
+  //   return { exceeded: false, reason: '' };
+  // }
+  
+  // ...继续检查逻辑
+}
+            </div>
+
+            <h4>3. UI界面移除控制元素</h4>
+            <div class="code">
+// 移除的UI组件：
+- 启用/禁用开关区域
+- 数据管理区域（清理、重置按钮）
+- handleToggleEnabled 函数
+- handleResetStats 函数
+- handleCleanupData 函数
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎨 用户界面变化</h3>
+            
+            <div class="success">
+                <h4>新的页面标题和说明</h4>
+                <p><strong>标题</strong>：访问监控设置</p>
+                <p><strong>描述</strong>：自动监控被阻止网站的访问频率，当超过阈值时引导到深呼吸页面帮助您重新专注</p>
+                <p><strong>提示</strong>：💡 访问监控已自动启用，帮助您建立健康的上网习惯</p>
+            </div>
+
+            <h4>保留的功能</h4>
+            <ul class="feature-list">
+                <li><strong>阈值设置</strong>：用户仍可调整访问次数和时间限制</li>
+                <li><strong>自定义消息</strong>：用户可设置个性化提醒文案</li>
+                <li><strong>访问统计查看</strong>：用户可查看当前访问数据</li>
+                <li><strong>数据刷新</strong>：用户可手动刷新统计数据</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>🔄 自动化机制</h3>
+            
+            <h4>每日重置（早上7点）</h4>
+            <ul class="feature-list">
+                <li>扩展启动时检查并执行重置</li>
+                <li>访问监控网站时检查并执行重置</li>
+                <li>每小时定期检查并执行重置</li>
+            </ul>
+
+            <h4>后台监控</h4>
+            <ul class="feature-list">
+                <li>自动记录访问时间和停留时长</li>
+                <li>实时检查是否超过阈值</li>
+                <li>超过阈值时自动跳转深呼吸页面</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ 重要说明</h3>
+            <p>这些更改使访问监控成为一个<span class="highlight">不可逃避的保护机制</span>。用户无法通过简单的开关操作来绕过监控，确保了功能的有效性。</p>
+            <p>用户仍然可以调整阈值和自定义消息，但无法完全关闭监控功能。</p>
+        </div>
+
+        <div class="section">
+            <h3>🧪 测试验证</h3>
+            <p>要验证强制监控功能，请：</p>
+            <ol>
+                <li>打开Chrome扩展的侧边栏</li>
+                <li>切换到"访问监控"标签</li>
+                <li>确认没有开关按钮可以关闭监控</li>
+                <li>确认没有"重置统计"和"清理数据"按钮</li>
+                <li>访问被阻止的网站，验证监控仍然有效</li>
+                <li>超过阈值时，确认会自动跳转到深呼吸页面</li>
+            </ol>
+        </div>
+
+        <div class="success">
+            <h3>✅ 预期效果</h3>
+            <p>现在访问监控真正成为了一个<strong>被动接受的监管机制</strong>，用户无法"反悔"而让机制失效，从而更好地帮助用户建立健康的上网习惯！</p>
+        </div>
+    </div>
+</body>
+</html>

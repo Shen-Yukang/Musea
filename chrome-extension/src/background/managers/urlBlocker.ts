@@ -22,6 +22,12 @@ export class UrlBlocker {
     try {
       console.log('UrlBlocker: Checking tab URL:', url);
 
+      // 首先检查并执行每日重置（基于早上7点）
+      const resetPerformed = await visitMonitorStorage.checkAndPerformDailyReset();
+      if (resetPerformed) {
+        console.log('UrlBlocker: Daily reset performed at 7AM');
+      }
+
       // 记录访问开始时间
       const tabKey = `${tabId}-${url}`;
       this.visitStartTimes.set(tabKey, Date.now());

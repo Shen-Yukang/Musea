@@ -316,6 +316,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // 保持消息通道开放以进行异步响应
   }
 
+  // 处理手动触发每日重置请求
+  if (message.action === 'triggerDailyReset') {
+    console.log('[BACKGROUND] Received manual daily reset trigger request');
+
+    import('@extension/storage')
+      .then(({ visitMonitorStorage }) => {
+        return visitMonitorStorage.checkAndPerformDailyReset();
+      })
+      .then(resetPerformed => {
+        console.log('[BACKGROUND] Manual daily reset check result:', resetPerformed);
+        sendResponse({ success: true, resetPerformed });
+      })
+      .catch(error => {
+        console.error('[BACKGROUND] Error during manual daily reset:', error);
+        errorReports.push({
+          context: 'MANUAL_DAILY_RESET',
+          timestamp: new Date().toISOString(),
+          errorType: error.constructor.name,
+          errorMessage: error.message,
+          errorStack: error.stack,
+          source: 'background',
+        });
+        sendResponse({ success: false, error: error.message });
+      });
+    return true; // 保持消息通道开放以进行异步响应
+  }
+
   return false;
 });
 
@@ -481,6 +508,13 @@ async function initialize() {
     console.log('🚀 [Background] Chrome runtime ID:', chrome.runtime.id);
     console.log('🚀 [Background] URL Blocker instance:', urlBlocker);
 
+    // 检查并执行每日重置（基于早上7点）
+    const { visitMonitorStorage } = await import('@extension/storage');
+    const resetPerformed = await visitMonitorStorage.checkAndPerformDailyReset();
+    if (resetPerformed) {
+      console.log('🚀 [Background] Daily reset performed during initialization');
+    }
+
     // 初始化主题
     const theme = await exampleThemeStorage.get();
     console.log('🚀 [Background] Theme loaded:', theme);
@@ -505,10 +539,18 @@ async function initialize() {
 
 // 启动定期清理任务
 function startPeriodicCleanup() {
-  // 每小时清理一次旧的访问记录
+  // 每小时清理一次旧的访问记录，并检查每日重置
   setInterval(
     async () => {
       try {
+        // 检查并执行每日重置
+        const { visitMonitorStorage } = await import('@extension/storage');
+        const resetPerformed = await visitMonitorStorage.checkAndPerformDailyReset();
+        if (resetPerformed) {
+          console.log('🧹 [Background] Daily reset performed during periodic cleanup');
+        }
+
+        // 执行常规清理
         await urlBlocker.cleanupVisitData();
         console.log('🧹 [Background] Periodic visit data cleanup completed');
       } catch (error) {

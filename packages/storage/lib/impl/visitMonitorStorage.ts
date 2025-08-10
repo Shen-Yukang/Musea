@@ -26,17 +26,19 @@ export interface VisitMonitorConfig {
   records: VisitRecord[]; // 访问记录
   stats: Record<string, SiteVisitStats>; // 网站统计数据
   lastCleanup: number; // 最后清理时间戳
+  lastDailyReset: number; // 最后每日重置时间戳
 }
 
-// 默认配置
+// 默认配置（监控始终启用，不允许用户关闭）
 const defaultConfig: VisitMonitorConfig = {
-  enabled: true,
+  enabled: true, // 强制启用，不允许用户关闭
   maxVisitsPerDay: 5,
   maxDurationPerDay: 15, // 15分钟
   customMessage: '您今天已经过度浏览了这些网站，让我们一起深呼吸，重新专注吧！',
   records: [],
   stats: {},
   lastCleanup: Date.now(),
+  lastDailyReset: Date.now(),
 };
 
 // 访问监控存储接口
@@ -50,6 +52,7 @@ export type VisitMonitorStorage = BaseStorage<VisitMonitorConfig> & {
   updateCustomMessage: (message: string) => Promise<void>;
   resetDailyStats: () => Promise<void>;
   getRecentRecords: (hours?: number) => Promise<VisitRecord[]>;
+  checkAndPerformDailyReset: () => Promise<boolean>;
 };
 
 // 创建访问监控基础存储
@@ -113,13 +116,14 @@ export const visitMonitorStorage: VisitMonitorStorage = {
     });
   },
 
-  // 检查是否超过阈值
+  // 检查是否超过阈值（监控始终启用）
   checkThreshold: async (url: string) => {
     const config = await visitMonitorBaseStorage.get();
 
-    if (!config.enabled) {
-      return { exceeded: false, reason: '' };
-    }
+    // 强制启用监控，忽略用户设置
+    // if (!config.enabled) {
+    //   return { exceeded: false, reason: '' };
+    // }
 
     const domain = new URL(url).hostname;
     const stats = config.stats[domain];
@@ -234,5 +238,75 @@ export const visitMonitorStorage: VisitMonitorStorage = {
     const cutoffTime = Date.now() - hours * 60 * 60 * 1000;
 
     return config.records.filter((record: VisitRecord) => record.timestamp > cutoffTime);
+  },
+
+  // 检查并执行每日重置（基于早上7点）
+  checkAndPerformDailyReset: async () => {
+    const now = Date.now();
+    const config = await visitMonitorBaseStorage.get();
+
+    console.log('VisitMonitor: Checking daily reset...');
+    console.log('VisitMonitor: Current time:', new Date(now).toLocaleString());
+    console.log(
+      'VisitMonitor: Config lastDailyReset:',
+      config.lastDailyReset ? new Date(config.lastDailyReset).toLocaleString() : 'undefined',
+    );
+    console.log('VisitMonitor: Current records count:', config.records ? config.records.length : 0);
+    console.log('VisitMonitor: Current stats count:', config.stats ? Object.keys(config.stats).length : 0);
+
+    // 如果 lastDailyReset 不存在，说明是旧版本数据，需要重置
+    if (!config.lastDailyReset) {
+      console.log('VisitMonitor: lastDailyReset not found, performing initial reset');
+
+      await visitMonitorBaseStorage.set((current: VisitMonitorConfig) => ({
+        ...current,
+        records: [],
+        stats: {},
+        lastDailyReset: now,
+        lastCleanup: now,
+      }));
+
+      console.log('VisitMonitor: Initial reset completed');
+      return true;
+    }
+
+    // 获取今天早上7点的时间戳
+    const today = new Date();
+    const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+
+    // 如果现在还没到今天早上7点，使用昨天早上7点
+    if (now < todayAt7AM.getTime()) {
+      todayAt7AM.setDate(todayAt7AM.getDate() - 1);
+    }
+
+    const resetTime = todayAt7AM.getTime();
+
+    console.log('VisitMonitor: Today at 7AM:', todayAt7AM.toLocaleString());
+    console.log('VisitMonitor: Reset time used:', new Date(resetTime).toLocaleString());
+    console.log('VisitMonitor: Should reset?', config.lastDailyReset < resetTime);
+
+    // 检查是否需要重置（上次重置时间早于今天早上7点）
+    if (config.lastDailyReset < resetTime) {
+      console.log(
+        'VisitMonitor: Performing daily reset at 7AM. Last reset:',
+        new Date(config.lastDailyReset),
+        'Reset time:',
+        new Date(resetTime),
+      );
+
+      await visitMonitorBaseStorage.set((current: VisitMonitorConfig) => ({
+        ...current,
+        records: [],
+        stats: {},
+        lastDailyReset: now,
+        lastCleanup: now,
+      }));
+
+      console.log('VisitMonitor: Daily reset completed');
+      return true; // 表示执行了重置
+    }
+
+    console.log('VisitMonitor: No reset needed');
+    return false; // 表示没有执行重置
   },
 };

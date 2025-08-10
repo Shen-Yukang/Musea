@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>访问监控重置调试工具</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        .button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-size: 14px;
+        }
+        
+        .button:hover {
+            background: #0056CC;
+        }
+        
+        .button.danger {
+            background: #FF3B30;
+        }
+        
+        .result {
+            background: #f8f8f8;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+        }
+        
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 访问监控重置调试工具</h1>
+        
+        <div class="section">
+            <h3>📊 当前状态检查</h3>
+            <button class="button" onclick="checkCurrentStatus()">检查当前状态</button>
+            <button class="button" onclick="checkTimeCalculation()">检查时间计算</button>
+            <button class="button" onclick="testResetLogic()">测试重置逻辑</button>
+            <div id="statusResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>🧪 手动测试</h3>
+            <button class="button" onclick="simulateOldData()">模拟昨天的数据</button>
+            <button class="button" onclick="forceReset()">强制执行重置</button>
+            <button class="button danger" onclick="clearAllData()">清空所有数据</button>
+            <div id="testResult"></div>
+        </div>
+
+        <div class="section">
+            <h3>📝 实时日志</h3>
+            <button class="button" onclick="startLogging()">开始监听日志</button>
+            <button class="button" onclick="clearLogs()">清空日志</button>
+            <div id="logResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let logInterval;
+
+        // 检查当前状态
+        async function checkCurrentStatus() {
+            try {
+                // 模拟Chrome扩展存储检查
+                const now = new Date();
+                const today = new Date();
+                const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+                
+                // 如果现在还没到今天早上7点，使用昨天早上7点
+                let resetTime = todayAt7AM;
+                if (now < todayAt7AM.getTime()) {
+                    resetTime = new Date(todayAt7AM);
+                    resetTime.setDate(resetTime.getDate() - 1);
+                }
+                
+                const nextReset = new Date(todayAt7AM);
+                if (now >= todayAt7AM.getTime()) {
+                    nextReset.setDate(nextReset.getDate() + 1);
+                }
+
+                const result = `
+当前时间: ${now.toLocaleString('zh-CN')}
+今天7点: ${todayAt7AM.toLocaleString('zh-CN')}
+当前重置点: ${resetTime.toLocaleString('zh-CN')}
+下次重置: ${nextReset.toLocaleString('zh-CN')}
+
+时间比较:
+- 现在 < 今天7点: ${now < todayAt7AM.getTime()}
+- 现在 >= 今天7点: ${now >= todayAt7AM.getTime()}
+- 使用的重置时间: ${resetTime.toLocaleString('zh-CN')}
+
+Chrome扩展存储检查:
+- 需要检查 chrome.storage.local 中的 'visit-monitor-storage-key'
+- 查看 lastDailyReset 字段
+- 如果 lastDailyReset < resetTime，则应该执行重置
+                `;
+
+                document.getElementById('statusResult').innerHTML = `<div class="result">${result}</div>`;
+                
+                // 尝试检查Chrome扩展存储（如果可用）
+                if (typeof chrome !== 'undefined' && chrome.storage) {
+                    chrome.storage.local.get(['visit-monitor-storage-key'], (result) => {
+                        if (result['visit-monitor-storage-key']) {
+                            const config = result['visit-monitor-storage-key'];
+                            const lastReset = new Date(config.lastDailyReset);
+                            const shouldReset = config.lastDailyReset < resetTime.getTime();
+                            
+                            const storageInfo = `
+Chrome扩展存储数据:
+- 上次重置: ${lastReset.toLocaleString('zh-CN')}
+- 访问记录数: ${config.records ? config.records.length : 0}
+- 统计站点数: ${config.stats ? Object.keys(config.stats).length : 0}
+- 是否需要重置: ${shouldReset}
+- 监控启用状态: ${config.enabled}
+                            `;
+                            
+                            document.getElementById('statusResult').innerHTML += `<div class="result">${storageInfo}</div>`;
+                            
+                            if (shouldReset) {
+                                document.getElementById('statusResult').innerHTML += `<div class="status warning">⚠️ 检测到需要重置，但可能没有被触发</div>`;
+                            } else {
+                                document.getElementById('statusResult').innerHTML += `<div class="status success">✅ 重置状态正常</div>`;
+                            }
+                        } else {
+                            document.getElementById('statusResult').innerHTML += `<div class="status error">❌ 未找到访问监控存储数据</div>`;
+                        }
+                    });
+                } else {
+                    document.getElementById('statusResult').innerHTML += `<div class="status warning">⚠️ 无法访问Chrome扩展存储（需要在扩展环境中运行）</div>`;
+                }
+                
+            } catch (error) {
+                document.getElementById('statusResult').innerHTML = `<div class="status error">❌ 检查失败: ${error.message}</div>`;
+            }
+        }
+
+        // 检查时间计算
+        function checkTimeCalculation() {
+            const now = new Date();
+            const tests = [];
+            
+            // 测试不同时间点的重置计算
+            const testTimes = [
+                new Date(2024, 11, 10, 6, 30), // 今天6:30
+                new Date(2024, 11, 10, 7, 0),  // 今天7:00
+                new Date(2024, 11, 10, 7, 30), // 今天7:30
+                new Date(2024, 11, 10, 12, 0), // 今天12:00
+                new Date(2024, 11, 10, 23, 59), // 今天23:59
+            ];
+            
+            testTimes.forEach(testTime => {
+                const today = new Date(testTime);
+                const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+                
+                let resetTime = todayAt7AM;
+                if (testTime < todayAt7AM.getTime()) {
+                    resetTime = new Date(todayAt7AM);
+                    resetTime.setDate(resetTime.getDate() - 1);
+                }
+                
+                tests.push(`
+测试时间: ${testTime.toLocaleString('zh-CN')}
+今天7点: ${todayAt7AM.toLocaleString('zh-CN')}
+重置时间: ${resetTime.toLocaleString('zh-CN')}
+使用昨天: ${testTime < todayAt7AM.getTime()}
+                `);
+            });
+            
+            document.getElementById('statusResult').innerHTML = `<div class="result">${tests.join('\n---\n')}</div>`;
+        }
+
+        // 测试重置逻辑
+        function testResetLogic() {
+            const mockConfig = {
+                lastDailyReset: Date.now() - 25 * 60 * 60 * 1000, // 25小时前
+                records: [
+                    { url: 'https://example.com', timestamp: Date.now() - 1000, duration: 5000 }
+                ],
+                stats: {
+                    'example.com': { visitCount: 3, totalDuration: 15000 }
+                }
+            };
+            
+            const now = Date.now();
+            const today = new Date();
+            const todayAt7AM = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 7, 0, 0, 0);
+            
+            let resetTime = todayAt7AM;
+            if (now < todayAt7AM.getTime()) {
+                resetTime = new Date(todayAt7AM);
+                resetTime.setDate(resetTime.getDate() - 1);
+            }
+            
+            const shouldReset = mockConfig.lastDailyReset < resetTime.getTime();
+            
+            const result = `
+模拟配置测试:
+- 模拟上次重置: ${new Date(mockConfig.lastDailyReset).toLocaleString('zh-CN')}
+- 当前重置点: ${resetTime.toLocaleString('zh-CN')}
+- 是否需要重置: ${shouldReset}
+- 重置前记录数: ${mockConfig.records.length}
+- 重置前统计数: ${Object.keys(mockConfig.stats).length}
+
+重置逻辑:
+if (config.lastDailyReset < resetTime) {
+  // 执行重置
+  records = []
+  stats = {}
+  lastDailyReset = now
+}
+            `;
+            
+            document.getElementById('statusResult').innerHTML = `<div class="result">${result}</div>`;
+            
+            if (shouldReset) {
+                document.getElementById('statusResult').innerHTML += `<div class="status success">✅ 重置逻辑正确，应该执行重置</div>`;
+            } else {
+                document.getElementById('statusResult').innerHTML += `<div class="status warning">⚠️ 重置逻辑显示无需重置</div>`;
+            }
+        }
+
+        // 模拟旧数据
+        function simulateOldData() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                const oldData = {
+                    enabled: true,
+                    maxVisitsPerDay: 5,
+                    maxDurationPerDay: 15,
+                    customMessage: '测试消息',
+                    records: [
+                        { url: 'https://test.com', timestamp: Date.now() - 25 * 60 * 60 * 1000, duration: 5000 }
+                    ],
+                    stats: {
+                        'test.com': { visitCount: 3, totalDuration: 15000 }
+                    },
+                    lastCleanup: Date.now() - 25 * 60 * 60 * 1000,
+                    lastDailyReset: Date.now() - 25 * 60 * 60 * 1000 // 25小时前
+                };
+                
+                chrome.storage.local.set({ 'visit-monitor-storage-key': oldData }, () => {
+                    document.getElementById('testResult').innerHTML = `<div class="status success">✅ 已设置25小时前的旧数据</div>`;
+                });
+            } else {
+                document.getElementById('testResult').innerHTML = `<div class="status error">❌ 需要在Chrome扩展环境中运行</div>`;
+            }
+        }
+
+        // 强制重置
+        function forceReset() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.get(['visit-monitor-storage-key'], (result) => {
+                    if (result['visit-monitor-storage-key']) {
+                        const config = result['visit-monitor-storage-key'];
+                        const resetConfig = {
+                            ...config,
+                            records: [],
+                            stats: {},
+                            lastDailyReset: Date.now(),
+                            lastCleanup: Date.now()
+                        };
+                        
+                        chrome.storage.local.set({ 'visit-monitor-storage-key': resetConfig }, () => {
+                            document.getElementById('testResult').innerHTML = `<div class="status success">✅ 强制重置完成</div>`;
+                        });
+                    }
+                });
+            } else {
+                document.getElementById('testResult').innerHTML = `<div class="status error">❌ 需要在Chrome扩展环境中运行</div>`;
+            }
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            if (typeof chrome !== 'undefined' && chrome.storage) {
+                chrome.storage.local.remove(['visit-monitor-storage-key'], () => {
+                    document.getElementById('testResult').innerHTML = `<div class="status success">✅ 所有数据已清空</div>`;
+                });
+            } else {
+                document.getElementById('testResult').innerHTML = `<div class="status error">❌ 需要在Chrome扩展环境中运行</div>`;
+            }
+        }
+
+        // 开始日志监听
+        function startLogging() {
+            if (logInterval) {
+                clearInterval(logInterval);
+            }
+            
+            document.getElementById('logResult').innerHTML = `<div class="status success">开始监听访问监控状态...</div>`;
+            
+            logInterval = setInterval(() => {
+                if (typeof chrome !== 'undefined' && chrome.storage) {
+                    chrome.storage.local.get(['visit-monitor-storage-key'], (result) => {
+                        if (result['visit-monitor-storage-key']) {
+                            const config = result['visit-monitor-storage-key'];
+                            const now = new Date();
+                            const lastReset = new Date(config.lastDailyReset);
+                            
+                            const logEntry = `
+[${now.toLocaleTimeString()}] 
+记录数: ${config.records ? config.records.length : 0}
+统计数: ${config.stats ? Object.keys(config.stats).length : 0}
+上次重置: ${lastReset.toLocaleTimeString()}
+                            `;
+                            
+                            const currentLog = document.getElementById('logResult').innerHTML;
+                            document.getElementById('logResult').innerHTML = currentLog + `<div class="result">${logEntry}</div>`;
+                        }
+                    });
+                }
+            }, 5000); // 每5秒检查一次
+        }
+
+        // 清空日志
+        function clearLogs() {
+            if (logInterval) {
+                clearInterval(logInterval);
+                logInterval = null;
+            }
+            document.getElementById('logResult').innerHTML = '';
+        }
+
+        // 页面加载时自动检查
+        window.addEventListener('load', checkCurrentStatus);
+    </script>
+</body>
+</html>

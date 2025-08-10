@@ -36,21 +36,6 @@ export const VisitMonitorSettings: React.FC<VisitMonitorSettingsProps> = ({ isLi
     setMaxDuration(visitConfig.maxDurationPerDay || 15);
   }, [visitConfig]);
 
-  // 切换启用状态
-  const handleToggleEnabled = async () => {
-    setIsLoading(true);
-    try {
-      await visitMonitorStorage.set(current => ({
-        ...current,
-        enabled: !current.enabled,
-      }));
-    } catch (error) {
-      console.error('Error toggling monitor:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // 更新阈值
   const handleUpdateThresholds = async () => {
     setIsLoading(true);
@@ -79,40 +64,6 @@ export const VisitMonitorSettings: React.FC<VisitMonitorSettingsProps> = ({ isLi
     }
   };
 
-  // 重置统计数据
-  const handleResetStats = async () => {
-    if (!confirm('确定要重置所有访问统计数据吗？此操作不可撤销。')) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await visitMonitorStorage.resetDailyStats();
-      setStats({});
-      alert('统计数据已重置');
-    } catch (error) {
-      console.error('Error resetting stats:', error);
-      alert('重置失败，请重试');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 清理旧数据
-  const handleCleanupData = async () => {
-    setIsLoading(true);
-    try {
-      await visitMonitorStorage.cleanupOldRecords();
-      await loadStats();
-      alert('数据清理完成');
-    } catch (error) {
-      console.error('Error cleaning up data:', error);
-      alert('清理失败，请重试');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // 格式化时间
   const formatDuration = (milliseconds: number) => {
     const minutes = Math.round(milliseconds / (1000 * 60));
@@ -130,30 +81,13 @@ export const VisitMonitorSettings: React.FC<VisitMonitorSettingsProps> = ({ isLi
       <div>
         <h2 className={`text-2xl font-bold ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>访问监控设置</h2>
         <p className={`mt-2 ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>
-          监控被阻止网站的访问频率，当超过阈值时自动引导到深呼吸页面
+          自动监控被阻止网站的访问频率，当超过阈值时引导到深呼吸页面帮助您重新专注
         </p>
-      </div>
-
-      {/* 启用/禁用开关 */}
-      <div
-        className={`p-4 rounded-lg ${isLight ? 'bg-white border border-gray-200' : 'bg-gray-700 border border-gray-600'}`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className={`text-lg font-medium ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>启用访问监控</h3>
-            <p className={`text-sm ${isLight ? 'text-gray-600' : 'text-gray-400'}`}>监控用户对被阻止网站的访问行为</p>
-          </div>
-          <button
-            onClick={handleToggleEnabled}
-            disabled={isLoading}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              visitConfig.enabled ? 'bg-blue-600' : isLight ? 'bg-gray-200' : 'bg-gray-600'
-            } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                visitConfig.enabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
+        <div
+          className={`mt-3 p-3 rounded-md ${isLight ? 'bg-blue-50 border border-blue-200' : 'bg-blue-900/20 border border-blue-700'}`}>
+          <p className={`text-sm ${isLight ? 'text-blue-800' : 'text-blue-300'}`}>
+            💡 访问监控已自动启用，帮助您建立健康的上网习惯
+          </p>
         </div>
       </div>
 
@@ -307,38 +241,6 @@ export const VisitMonitorSettings: React.FC<VisitMonitorSettingsProps> = ({ isLi
             ))}
           </div>
         )}
-      </div>
-
-      {/* 数据管理 */}
-      <div
-        className={`p-4 rounded-lg ${isLight ? 'bg-white border border-gray-200' : 'bg-gray-700 border border-gray-600'}`}>
-        <h3 className={`text-lg font-medium mb-4 ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>数据管理</h3>
-
-        <div className="flex space-x-3">
-          <button
-            onClick={handleCleanupData}
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-md text-white font-medium ${
-              isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}>
-            清理旧数据
-          </button>
-
-          <button
-            onClick={handleResetStats}
-            disabled={isLoading}
-            className={`px-4 py-2 rounded-md text-white font-medium ${
-              isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
-            }`}>
-            重置统计
-          </button>
-        </div>
-
-        <p className={`text-xs mt-2 ${isLight ? 'text-gray-500' : 'text-gray-400'}`}>
-          清理旧数据：删除24小时前的访问记录
-          <br />
-          重置统计：清空所有访问记录和统计数据
-        </p>
       </div>
     </div>
   );
