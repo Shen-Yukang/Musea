@@ -10,6 +10,14 @@
 ![MCP](https://img.shields.io/badge/MCP-Enabled-purple.svg)
 
 *一个功能强大的Chrome扩展，结合AI虚拟角色和MCP架构，帮助您保持专注，提高工作效率*
+
+---
+
+**🌍 Language / 语言**
+
+[![English](https://img.shields.io/badge/English-README-blue?style=for-the-badge&logo=readme)](./README_EN.md) | [![中文](https://img.shields.io/badge/中文-README-red?style=for-the-badge&logo=readme)](./README.md)
+
+---
 ## 🎯 适用人群
 
 - **📚 学生群体** - 备考复习、论文写作、在线学习时需要专注环境
